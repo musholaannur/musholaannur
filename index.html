@@ -1,0 +1,451 @@
+import React, { useState, useEffect } from 'react';
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { 
+  getFirestore, 
+  collection, 
+  doc, 
+  onSnapshot, 
+  deleteDoc, 
+  updateDoc,
+  addDoc,
+  serverTimestamp,
+  query
+} from 'firebase/firestore';
+import { Trash2, ClipboardList, Wallet, Edit3, Save, Lock, RefreshCw, AlertCircle, Wifi } from 'lucide-react';
+
+// Safely parse Firebase Config
+const getFirebaseConfig = () => {
+  try {
+    return typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+const firebaseConfig = getFirebaseConfig();
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'mushola-annur-infaq';
+
+// Initialize Firebase only if config exists
+let app, auth, db;
+if (firebaseConfig) {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  auth = getAuth(app);
+  db = getFirestore(app);
+}
+
+const SECRET_PIN = "003992";
+
+const App = () => {
+  const [user, setUser] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [isEditing, setIsEditing] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pendingAction, setPendingAction] = useState(null);
+  const [pinError, setPinError] = useState(false);
+  const [syncStatus, setSyncStatus] = useState('connecting'); 
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const [formData, setFormData] = useState({
+    tanggal: new Date().toISOString().split('T')[0],
+    jenis: 'MASUK',
+    keterangan: '',
+    nominal: 0
+  });
+
+  // Authentication Logic
+  useEffect(() => {
+    if (!auth) {
+      setErrorMessage("Konfigurasi Database Tidak Ditemukan.");
+      setLoading(false);
+      return;
+    }
+
+    const initAuth = async () => {
+      try {
+        setSyncStatus('connecting');
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) {
+        console.error("Auth error:", err);
+        setSyncStatus('error');
+        // Fallback to anonymous if custom token fails
+        try { await signInAnonymously(auth); } catch(e) {}
+      }
+    };
+
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u) setErrorMessage(null);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Data Fetching Logic
+  useEffect(() => {
+    if (!user || !db) return;
+
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'transactions');
+    const q = query(colRef);
+
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        // Sorting logic in memory
+        const sortedData = [...data].sort((a, b) => {
+          const dateA = new Date(a.tanggal);
+          const dateB = new Date(b.tanggal);
+          if (dateA - dateB !== 0) return dateA - dateB;
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeA - timeB;
+        });
+
+        setTransactions(sortedData);
+        setSyncStatus('online');
+        setLoading(false);
+      }, 
+      (error) => {
+        console.error("Firestore error:", error);
+        setSyncStatus('error');
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const totalMasuk = transactions.filter(t => t.jenis === 'MASUK').reduce((acc, curr) => acc + (Number(curr.nominal) || 0), 0);
+  const totalKeluar = transactions.filter(t => t.jenis === 'KELUAR').reduce((acc, curr) => acc + (Number(curr.nominal) || 0), 0);
+  const saldoSekarang = totalMasuk - totalKeluar;
+
+  const requestVerification = (actionType, data = null) => {
+    setPendingAction({ type: actionType, data });
+    setShowPinModal(true);
+    setPinInput("");
+    setPinError(false);
+  };
+
+  const handleEdit = (t) => {
+    setIsEditing(t.id);
+    setFormData({
+      tanggal: t.tanggal,
+      jenis: t.jenis,
+      keterangan: t.keterangan,
+      nominal: t.nominal
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const executeAction = async () => {
+    if (pinInput !== SECRET_PIN) {
+      setPinError(true);
+      return;
+    }
+    const { type, data } = pendingAction;
+    setShowPinModal(false);
+    
+    try {
+      if (!db || !user) throw new Error("Database not ready");
+
+      if (type === 'SAVE') {
+        if (isEditing) {
+          const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'transactions', isEditing);
+          await updateDoc(docRef, { ...formData, updatedAt: serverTimestamp() });
+          setIsEditing(null);
+        } else {
+          const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'transactions');
+          await addDoc(colRef, { ...formData, createdAt: serverTimestamp() });
+        }
+        setFormData({ tanggal: new Date().toISOString().split('T')[0], jenis: 'MASUK', keterangan: '', nominal: 0 });
+      } else if (type === 'DELETE') {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'transactions', data);
+        await deleteDoc(docRef);
+      }
+    } catch (err) {
+      setErrorMessage("Gagal Memproses Data. Periksa Koneksi.");
+    }
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (!user || formData.nominal <= 0 || !formData.keterangan) return;
+    requestVerification('SAVE');
+  };
+
+  const formatCurrency = (val) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency', currency: 'IDR', minimumFractionDigits: 0
+    }).format(val).replace('Rp', 'Rp ');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white font-sans">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <RefreshCw className="animate-spin text-[#1a4d33]" size={40} />
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Menghubungkan Database</p>
+            <p className="text-[8px] font-bold text-slate-300 mt-1 uppercase">MUSHOLA ANNUR DIGITAL</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans antialiased text-slate-950">
+      <div className="max-w-4xl mx-auto space-y-6">
+        
+        {errorMessage && (
+          <div className="bg-red-600 text-white p-4 rounded-xl flex items-center gap-3 animate-pulse shadow-lg">
+            <AlertCircle size={20} />
+            <p className="text-[10px] font-black uppercase tracking-widest flex-1">{errorMessage}</p>
+            <button onClick={() => window.location.reload()} className="bg-white text-red-600 px-4 py-1 rounded-lg text-[10px] font-black uppercase">REFRESH</button>
+          </div>
+        )}
+
+        {showPinModal && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-[2rem] w-full max-w-sm p-8 shadow-2xl">
+              <div className="flex flex-col items-center text-center">
+                <Lock size={32} className="text-slate-300 mb-4" />
+                <h3 className="text-xl font-black uppercase tracking-tighter text-slate-900">VERIFIKASI PIN</h3>
+                <input
+                  type="password"
+                  maxLength={6}
+                  inputMode="numeric"
+                  value={pinInput}
+                  onChange={(e) => setPinInput(e.target.value)}
+                  className={`w-full text-center text-4xl tracking-[0.5em] font-black border-4 rounded-2xl py-5 mt-6 transition-all ${pinError ? 'border-red-500 bg-red-50' : 'border-slate-100 bg-slate-50 focus:border-[#1a4d33]'}`}
+                  autoFocus
+                />
+                <div className="grid grid-cols-2 gap-4 w-full mt-8">
+                  <button onClick={() => setShowPinModal(false)} className="py-4 rounded-xl bg-slate-100 text-slate-400 font-black text-[10px] uppercase tracking-widest">BATAL</button>
+                  <button onClick={executeAction} className="py-4 rounded-xl bg-[#1a4d33] text-white font-black text-[10px] uppercase tracking-widest">LANJUT</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Header Section */}
+        <header className="bg-[#1a4d33] text-white p-6 md:p-8 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4 border-b-4 border-black/10">
+          <div className="text-center md:text-left">
+            <h1 className="text-2xl md:text-3xl font-[900] uppercase tracking-wider leading-tight">
+              MUSHOLA ANNUR
+            </h1>
+            <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">LAPORAN INFAQ DIGITAL SYSTEM</p>
+          </div>
+          
+          <div className="flex flex-col items-center md:items-end gap-2">
+            <div className="bg-white/10 px-6 py-2 rounded-full text-[10px] font-black border border-white/20 uppercase tracking-widest">
+              {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </div>
+            
+            <div className="flex items-center gap-2 px-3 py-1 bg-black/20 rounded-lg">
+              <div className="relative flex items-center justify-center">
+                <Wifi 
+                  size={14} 
+                  className={`${syncStatus === 'online' ? 'text-green-400' : 'text-slate-400'}`} 
+                />
+                {syncStatus === 'online' && (
+                  <span className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-25"></span>
+                )}
+              </div>
+              <span className={`text-[8px] font-black uppercase tracking-widest ${syncStatus === 'online' ? 'text-green-400' : 'text-slate-400'}`}>
+                {syncStatus === 'online' ? 'Sistem Online' : 'Offline Mode'}
+              </span>
+            </div>
+          </div>
+        </header>
+
+        {/* Saldo Section with Grid */}
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-700 to-indigo-700 rounded-[2.2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+          
+          <div 
+            className="relative bg-[#1e40af] text-white p-8 md:p-12 rounded-[2rem] shadow-2xl flex flex-col md:flex-row items-center gap-8 overflow-hidden"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)
+              `,
+              backgroundSize: '24px 24px'
+            }}
+          >
+            <div className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white/30 flex items-center justify-center relative bg-white/5 backdrop-blur-sm shadow-inner">
+              <div className="absolute inset-2 rounded-full border border-white/10"></div>
+              <div className="text-center p-2">
+                <div className="text-[8px] font-black leading-none mb-1 tracking-tighter text-white/90">MUSHOLA WAKAF</div>
+                <div className="text-lg font-black leading-none mb-1">ANNUR</div>
+                <div className="w-8 h-0.5 bg-white mx-auto my-1"></div>
+                <div className="text-[6px] font-bold leading-tight text-white/80">RT 08 RW 04<br/>BAKALAN LOR</div>
+              </div>
+            </div>
+
+            <div className="flex-1 text-center md:text-left space-y-1">
+              <p className="text-[11px] font-black text-white/70 uppercase tracking-[0.4em] drop-shadow-md">SALDO INFAQ SAAT INI</p>
+              <h2 className="text-5xl md:text-7xl font-[900] tabular-nums tracking-tighter drop-shadow-2xl">
+                {formatCurrency(saldoSekarang).replace('Rp', 'Rp ')}
+              </h2>
+            </div>
+
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-[80px]"></div>
+          </div>
+        </div>
+
+        {/* Ringskasan Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <div className="bg-white p-6 rounded-2xl border-l-[8px] border-green-500 shadow-sm">
+            <p className="text-[10px] text-slate-400 font-black uppercase mb-1 tracking-widest">TOTAL PEMASUKAN</p>
+            <p className="text-3xl font-black text-green-600 tabular-nums">{formatCurrency(totalMasuk)}</p>
+          </div>
+          <div className="bg-white p-6 rounded-2xl border-l-[8px] border-red-500 shadow-sm">
+            <p className="text-[10px] text-slate-400 font-black uppercase mb-1 tracking-widest">TOTAL PENGELUARAN</p>
+            <p className="text-3xl font-black text-red-600 tabular-nums">{formatCurrency(totalKeluar)}</p>
+          </div>
+        </div>
+
+        {/* Form Transaksi */}
+        <section className={`bg-white rounded-3xl shadow-sm border-2 p-6 md:p-8 transition-all ${isEditing ? 'border-orange-400' : 'border-slate-100'}`}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1.5 h-6 bg-[#1a4d33] rounded-full"></div>
+            <h3 className="font-black text-[11px] uppercase tracking-[0.3em] text-slate-800">
+              {isEditing ? 'EDIT TRANSAKSI' : 'CATAT TRANSAKSI BARU'}
+            </h3>
+          </div>
+
+          <form onSubmit={handleFormSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">TANGGAL</label>
+                <input 
+                  type="date" 
+                  className="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-[#1a4d33]/20"
+                  value={formData.tanggal}
+                  onChange={(e) => setFormData({...formData, tanggal: e.target.value})}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">JENIS</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({...formData, jenis: 'MASUK'})}
+                    className={`py-3 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${formData.jenis === 'MASUK' ? 'bg-[#14b8a6] border-[#14b8a6] text-white' : 'border-slate-100 text-slate-400 bg-slate-50'}`}
+                  >
+                    MASUK
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({...formData, jenis: 'KELUAR'})}
+                    className={`py-3 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${formData.jenis === 'KELUAR' ? 'bg-red-500 border-red-500 text-white' : 'border-slate-100 text-slate-400 bg-slate-50'}`}
+                  >
+                    KELUAR
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">KETERANGAN</label>
+              <input 
+                type="text" 
+                placeholder="Contoh: Infaq Jumat, Sedekah Subuh, Listrik, dsb"
+                className="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-[#1a4d33]/20"
+                value={formData.keterangan}
+                onChange={(e) => setFormData({...formData, keterangan: e.target.value})}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">NOMINAL (RP)</label>
+              <input 
+                type="number" 
+                className="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-4 text-2xl font-black tabular-nums focus:ring-2 focus:ring-[#1a4d33]/20"
+                value={formData.nominal}
+                onChange={(e) => setFormData({...formData, nominal: parseInt(e.target.value) || 0})}
+              />
+            </div>
+
+            <button 
+              type="submit"
+              className={`w-full flex items-center justify-center gap-3 text-white font-black py-4 rounded-xl shadow-lg uppercase tracking-widest text-[11px] transition-all active:scale-95 ${isEditing ? 'bg-orange-500' : 'bg-[#14b8a6]'}`}
+            >
+              <Save size={18} /> {isEditing ? 'UPDATE DATA' : 'SIMPAN DATA'}
+            </button>
+          </form>
+        </section>
+
+        {/* History Table */}
+        <section className="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">
+          <div className="p-6 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
+            <h4 className="font-black text-[10px] uppercase tracking-widest text-slate-500 flex items-center gap-2">
+              <ClipboardList size={16} />
+              RIWAYAT MUTASI
+            </h4>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-400 border-b border-slate-100 text-[9px] font-black uppercase">
+                  <th className="px-6 py-4">TGL</th>
+                  <th className="px-6 py-4">KETERANGAN</th>
+                  <th className="px-6 py-4 text-right">MASUK</th>
+                  <th className="px-6 py-4 text-right">KELUAR</th>
+                  <th className="px-6 py-4 text-right">AKSI</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {transactions.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="py-16 text-center text-slate-300 italic text-xs font-bold">Belum ada data tercatat.</td>
+                  </tr>
+                ) : (
+                  [...transactions].reverse().map((t) => (
+                    <tr key={t.id} className="hover:bg-slate-50 transition-colors group">
+                      <td className="px-6 py-4 text-[10px] font-bold text-slate-400 whitespace-nowrap">
+                        {t.tanggal.split('-').reverse().join('/')}
+                      </td>
+                      <td className="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase">{t.keterangan}</td>
+                      <td className="px-6 py-4 text-[11px] font-bold text-green-600 text-right">
+                        {t.jenis === 'MASUK' ? formatCurrency(t.nominal).replace('Rp', '') : '-'}
+                      </td>
+                      <td className="px-6 py-4 text-[11px] font-bold text-red-500 text-right">
+                        {t.jenis === 'KELUAR' ? formatCurrency(t.nominal).replace('Rp', '') : '-'}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100">
+                          <button onClick={() => handleEdit(t)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg"><Edit3 size={14} /></button>
+                          <button onClick={() => requestVerification('DELETE', t.id)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 size={14} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <footer className="text-center py-10 opacity-20">
+          <p className="text-[9px] font-black uppercase tracking-[0.8em]">MUSHOLA ANNUR DIGITAL SYSTEM • v2.1</p>
+        </footer>
+      </div>
+    </div>
+  );
+};
+
+export default App;
