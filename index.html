@@ -1,349 +1,96 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Infaq Digital - Musholla An-Nur</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
-        .wifi-ping { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
-        @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Infaq Digital - Musholla An-Nur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+body { font-family: 'Plus Jakarta Sans', sans-serif; }
+</style>
 </head>
 <body class="bg-[#f8fafc] text-slate-950">
 
-    <div id="app" class="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
-        
-        <!-- Error Message -->
-        <div id="error-box" class="hidden bg-red-600 text-white p-4 rounded-xl flex items-center gap-3 animate-pulse shadow-lg">
-            <i data-lucide="alert-circle"></i>
-            <p id="error-text" class="text-[10px] font-black uppercase tracking-widest flex-1"></p>
-            <button onclick="location.reload()" class="bg-white text-red-600 px-4 py-1 rounded-lg text-[10px] font-black uppercase">REFRESH</button>
-        </div>
+<div class="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
 
-        <!-- Header Section -->
-        <header class="bg-[#1a4d33] text-white p-6 md:p-8 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4 border-b-4 border-black/10">
-            <div class="text-center md:text-left">
-                <h1 class="text-2xl md:text-3xl font-[900] uppercase tracking-wider leading-tight">MUSHOLLA WAKAF ANNUR</h1>
-                <p class="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">LAPORAN INFAQ DIGITAL SYSTEM</p>
-            </div>
-            
-            <div class="flex flex-col items-center md:items-end gap-2">
-                <div class="bg-white/10 px-6 py-2 rounded-full text-[10px] font-black border border-white/20 uppercase tracking-widest" id="current-date">
-                    -- --- ----
-                </div>
-                
-                <div class="flex items-center gap-2 px-3 py-1 bg-black/20 rounded-lg">
-                    <div class="relative flex items-center justify-center">
-                        <i data-lucide="wifi" id="wifi-icon" class="w-4 h-4 text-slate-400"></i>
-                        <span id="wifi-ping" class="hidden absolute inset-0 rounded-full bg-green-400 wifi-ping opacity-25"></span>
-                    </div>
-                    <span id="sync-status" class="text-[8px] font-black uppercase tracking-widest text-slate-400">Menghubungkan...</span>
-                </div>
-            </div>
-        </header>
+<header class="bg-[#1a4d33] text-white p-6 md:p-8 rounded-2xl shadow-lg">
+<h1 class="text-2xl font-black uppercase">MUSHOLLA WAKAF ANNUR</h1>
+<p class="text-[10px] uppercase tracking-widest">LAPORAN INFAQ DIGITAL</p>
+</header>
 
-        <!-- Saldo Display -->
-        <div class="relative group">
-            <div class="absolute -inset-1 bg-gradient-to-r from-blue-700 to-indigo-700 rounded-[2.2rem] blur opacity-25"></div>
-            <div class="relative bg-[#1e40af] text-white p-8 md:p-12 rounded-[2rem] shadow-2xl flex flex-col md:flex-row items-center gap-8 overflow-hidden">
-                <div class="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white/30 flex items-center justify-center relative bg-white/5 backdrop-blur-sm">
-                    <div class="text-center p-2">
-                        <div class="text-[8px] font-black leading-none mb-1 text-white/90">MUSHOLLA WAKAF</div>
-                        <div class="text-lg font-black leading-none mb-1">AN-NUR</div>
-                        <div class="w-8 h-0.5 bg-white mx-auto my-1"></div>
-                        <div class="text-[6px] font-bold text-white/80">RT 08 RW 04<br/>BAKALAN LOR</div>
-                    </div>
-                </div>
+<!-- SALDO -->
+<div class="bg-[#1e40af] text-white p-8 rounded-2xl text-center">
+<p class="text-[11px] uppercase tracking-widest">Saldo Saat Ini</p>
+<h2 id="total-balance" class="text-5xl font-black">Rp 0</h2>
+</div>
 
-                <div class="flex-1 text-center md:text-left">
-                    <p class="text-[11px] font-black text-white/70 uppercase tracking-[0.4em]">SALDO INFAQ SAAT INI</p>
-                    <h2 id="total-balance" class="text-5xl md:text-7xl font-[900] tabular-nums tracking-tighter drop-shadow-2xl">Rp 0</h2>
-                </div>
-            </div>
-        </div>
+<!-- RINGKASAN -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white p-6 rounded-xl border-l-8 border-green-500">
+<p class="text-[10px] uppercase">Total Masuk</p>
+<p id="total-in" class="text-2xl font-black text-green-600">Rp 0</p>
+</div>
+<div class="bg-white p-6 rounded-xl border-l-8 border-red-500">
+<p class="text-[10px] uppercase">Total Keluar</p>
+<p id="total-out" class="text-2xl font-black text-red-600">Rp 0</p>
+</div>
+</div>
 
-        <!-- Ringkasan Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div class="bg-white p-6 rounded-2xl border-l-[8px] border-green-500 shadow-sm">
-                <p class="text-[10px] text-slate-400 font-black uppercase mb-1 tracking-widest">TOTAL PEMASUKAN</p>
-                <p id="total-in" class="text-3xl font-black text-green-600 tabular-nums">Rp 0</p>
-            </div>
-            <div class="bg-white p-6 rounded-2xl border-l-[8px] border-red-500 shadow-sm">
-                <p class="text-[10px] text-slate-400 font-black uppercase mb-1 tracking-widest">TOTAL PENGELUARAN</p>
-                <p id="total-out" class="text-3xl font-black text-red-600 tabular-nums">Rp 0</p>
-            </div>
-        </div>
+<!-- TABEL -->
+<div class="bg-white rounded-2xl p-4 overflow-auto">
+<table class="w-full text-sm" id="data-table">
+<thead class="bg-slate-100">
+<tr>
+<th class="p-2">Tanggal</th>
+<th class="p-2">Keterangan</th>
+<th class="p-2">Jenis</th>
+<th class="p-2">Nominal</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
 
-        <!-- Form Input -->
-        <section class="bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-6 md:p-8" id="form-container">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-1.5 h-6 bg-[#1a4d33] rounded-full"></div>
-                <h3 id="form-title" class="font-black text-[11px] uppercase tracking-[0.3em] text-slate-800">CATAT TRANSAKSI BARU</h3>
-            </div>
+</div>
 
-            <form id="transaction-form" class="space-y-5">
-                <input type="hidden" id="edit-id" value="">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="space-y-1.5">
-                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">TANGGAL</label>
-                        <input type="date" id="input-tanggal" required class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-[#1a4d33]/20">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">JENIS</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button type="button" id="btn-masuk" class="type-btn py-3 rounded-xl text-[10px] font-black uppercase border-2 transition-all bg-[#14b8a6] border-[#14b8a6] text-white">MASUK</button>
-                            <button type="button" id="btn-keluar" class="type-btn py-3 rounded-xl text-[10px] font-black uppercase border-2 transition-all border-slate-100 text-slate-400 bg-slate-50">KELUAR</button>
-                        </div>
-                    </div>
-                </div>
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMANG5sjM5iCijx8EfEP_o0mm2BtD3i-epE3ozKLCCpZxHq0Mg0cElzmPPxEZ68khccJth42Xtko9l/pub?output=csv";
 
-                <div class="space-y-1.5">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">KETERANGAN</label>
-                    <input type="text" id="input-keterangan" required placeholder="Contoh: Infaq Jumat, Listrik, dsb" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-[#1a4d33]/20">
-                </div>
+fetch(sheetURL)
+.then(res => res.text())
+.then(csv => {
+  const rows = csv.split("\n").slice(1);
+  let totalIn = 0;
+  let totalOut = 0;
+  const tbody = document.querySelector("#data-table tbody");
 
-                <div class="space-y-1.5">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">NOMINAL (RP)</label>
-                    <input type="number" id="input-nominal" required class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-4 text-2xl font-black tabular-nums outline-none focus:ring-2 focus:ring-[#1a4d33]/20">
-                </div>
+  rows.forEach(row => {
+    const cols = row.split(",");
+    const tanggal = cols[0];
+    const ket = cols[1];
+    const jenis = cols[2];
+    const nominal = parseInt(cols[3]) || 0;
 
-                <button type="submit" class="w-full flex items-center justify-center gap-3 bg-[#14b8a6] text-white font-black py-4 rounded-xl shadow-lg uppercase tracking-widest text-[11px] hover:brightness-110 active:scale-95 transition-all">
-                    <i data-lucide="save"></i> <span id="submit-text">SIMPAN DATA</span>
-                </button>
-            </form>
-        </section>
+    if (jenis === "MASUK") totalIn += nominal;
+    if (jenis === "KELUAR") totalOut += nominal;
 
-        <!-- Table -->
-        <section class="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">
-            <div class="p-6 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
-                <h4 class="font-black text-[10px] uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                    <i data-lucide="clipboard-list" class="w-4 h-4"></i> RIWAYAT MUTASI
-                </h4>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 text-slate-400 border-b border-slate-100 text-[9px] font-black uppercase">
-                            <th class="px-6 py-4">TGL</th>
-                            <th class="px-6 py-4">KETERANGAN</th>
-                            <th class="px-6 py-4 text-right">MASUK</th>
-                            <th class="px-6 py-4 text-right">KELUAR</th>
-                            <th class="px-6 py-4 text-right">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body" class="divide-y divide-slate-50">
-                        <!-- Data rows injected here -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="p-2">${tanggal}</td>
+      <td class="p-2">${ket}</td>
+      <td class="p-2 font-bold">${jenis}</td>
+      <td class="p-2">Rp ${nominal.toLocaleString("id-ID")}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-        <footer class="text-center py-10 opacity-20">
-            <p class="text-[9px] font-black uppercase tracking-[0.8em]">MUSHOLA ANNUR DIGITAL SYSTEM • v3.0 HTML</p>
-        </footer>
-    </div>
+  document.getElementById("total-in").innerText = "Rp " + totalIn.toLocaleString("id-ID");
+  document.getElementById("total-out").innerText = "Rp " + totalOut.toLocaleString("id-ID");
+  document.getElementById("total-balance").innerText = "Rp " + (totalIn - totalOut).toLocaleString("id-ID");
+});
+</script>
 
-    <!-- PIN Modal -->
-    <div id="pin-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm p-8 shadow-2xl">
-            <div class="flex flex-col items-center text-center">
-                <i data-lucide="lock" class="w-10 h-10 text-slate-300 mb-4"></i>
-                <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900">VERIFIKASI PIN</h3>
-                <input type="password" id="pin-input" maxlength="6" class="w-full text-center text-4xl tracking-[0.5em] font-black border-4 border-slate-100 bg-slate-50 rounded-2xl py-5 mt-6 outline-none focus:border-[#1a4d33]">
-                <p id="pin-error" class="hidden text-red-500 text-[10px] font-bold mt-2 uppercase">PIN Salah!</p>
-                <div class="grid grid-cols-2 gap-4 w-full mt-8">
-                    <button onclick="closePinModal()" class="py-4 rounded-xl bg-slate-100 text-slate-400 font-black text-[10px] uppercase tracking-widest">BATAL</button>
-                    <button onclick="confirmPin()" class="py-4 rounded-xl bg-[#1a4d33] text-white font-black text-[10px] uppercase tracking-widest">LANJUT</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global State
-        const SECRET_PIN = "003992";
-        let db, auth, user, currentAction = null;
-        let activeJenis = 'MASUK';
-        let transactions = [];
-
-        // Firebase Init
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mushola-annur-infaq';
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-
-        // UI Helpers
-        const formatCurrency = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val).replace('Rp', 'Rp ');
-        
-        window.closePinModal = () => {
-            document.getElementById('pin-modal').classList.add('hidden');
-            document.getElementById('pin-input').value = "";
-            document.getElementById('pin-error').classList.add('hidden');
-        };
-
-        window.confirmPin = async () => {
-            const input = document.getElementById('pin-input').value;
-            if (input !== SECRET_PIN) {
-                document.getElementById('pin-error').classList.remove('hidden');
-                return;
-            }
-            closePinModal();
-            if (currentAction) await currentAction();
-        };
-
-        // Form Logic
-        document.getElementById('btn-masuk').onclick = () => {
-            activeJenis = 'MASUK';
-            document.getElementById('btn-masuk').className = "type-btn py-3 rounded-xl text-[10px] font-black uppercase border-2 bg-[#14b8a6] border-[#14b8a6] text-white";
-            document.getElementById('btn-keluar').className = "type-btn py-3 rounded-xl text-[10px] font-black uppercase border-2 border-slate-100 text-slate-400 bg-slate-50";
-        };
-
-        document.getElementById('btn-keluar').onclick = () => {
-            activeJenis = 'KELUAR';
-            document.getElementById('btn-keluar').className = "type-btn py-3 rounded-xl text-[10px] font-black uppercase border-2 bg-red-500 border-red-500 text-white";
-            document.getElementById('btn-masuk').className = "type-btn py-3 rounded-xl text-[10px] font-black uppercase border-2 border-slate-100 text-slate-400 bg-slate-50";
-        };
-
-        document.getElementById('transaction-form').onsubmit = (e) => {
-            e.preventDefault();
-            const editId = document.getElementById('edit-id').value;
-            const data = {
-                tanggal: document.getElementById('input-tanggal').value,
-                jenis: activeJenis,
-                keterangan: document.getElementById('input-keterangan').value,
-                nominal: parseInt(document.getElementById('input-nominal').value)
-            };
-
-            currentAction = async () => {
-                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'transactions');
-                if (editId) {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'transactions', editId), { ...data, updatedAt: serverTimestamp() });
-                } else {
-                    await addDoc(colRef, { ...data, createdAt: serverTimestamp() });
-                }
-                resetForm();
-            };
-            document.getElementById('pin-modal').classList.remove('hidden');
-            document.getElementById('pin-input').focus();
-        };
-
-        const resetForm = () => {
-            document.getElementById('edit-id').value = "";
-            document.getElementById('input-keterangan').value = "";
-            document.getElementById('input-nominal').value = 0;
-            document.getElementById('form-title').innerText = "CATAT TRANSAKSI BARU";
-            document.getElementById('submit-text').innerText = "SIMPAN DATA";
-            document.getElementById('form-container').classList.remove('border-orange-400');
-        };
-
-        // Edit/Delete
-        window.triggerEdit = (id) => {
-            const t = transactions.find(x => x.id === id);
-            if (!t) return;
-            document.getElementById('edit-id').value = t.id;
-            document.getElementById('input-tanggal').value = t.tanggal;
-            document.getElementById('input-keterangan').value = t.keterangan;
-            document.getElementById('input-nominal').value = t.nominal;
-            activeJenis = t.jenis;
-            if (t.jenis === 'MASUK') document.getElementById('btn-masuk').click();
-            else document.getElementById('btn-keluar').click();
-            
-            document.getElementById('form-title').innerText = "EDIT TRANSAKSI";
-            document.getElementById('submit-text').innerText = "UPDATE DATA";
-            document.getElementById('form-container').classList.add('border-orange-400');
-            window.scrollTo({ top: document.getElementById('form-container').offsetTop - 20, behavior: 'smooth' });
-        };
-
-        window.triggerDelete = (id) => {
-            currentAction = async () => {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'transactions', id));
-            };
-            document.getElementById('pin-modal').classList.remove('hidden');
-        };
-
-        // Auth & Sync
-        const init = async () => {
-            lucide.createIcons();
-            document.getElementById('input-tanggal').value = new Date().toISOString().split('T')[0];
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
-
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error(err);
-                document.getElementById('error-box').classList.remove('hidden');
-                document.getElementById('error-text').innerText = "Gagal Verifikasi Keamanan";
-            }
-        };
-
-        onAuthStateChanged(auth, (u) => {
-            user = u;
-            if (u) {
-                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'transactions');
-                onSnapshot(colRef, (snapshot) => {
-                    transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-                        .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
-                    
-                    render();
-                    updateStatus(true);
-                }, (err) => {
-                    updateStatus(false);
-                });
-            }
-        });
-
-        const updateStatus = (isOnline) => {
-            const icon = document.getElementById('wifi-icon');
-            const ping = document.getElementById('wifi-ping');
-            const text = document.getElementById('sync-status');
-
-            if (isOnline) {
-                icon.className = "w-4 h-4 text-green-400";
-                ping.classList.remove('hidden');
-                text.innerText = "Sistem Online";
-                text.className = "text-[8px] font-black uppercase tracking-widest text-green-400";
-            } else {
-                icon.className = "w-4 h-4 text-slate-400";
-                ping.classList.add('hidden');
-                text.innerText = "Offline Mode";
-                text.className = "text-[8px] font-black uppercase tracking-widest text-slate-400";
-            }
-        };
-
-        const render = () => {
-            const body = document.getElementById('table-body');
-            body.innerHTML = "";
-
-            let tIn = 0, tOut = 0;
-            
-            [...transactions].reverse().forEach(t => {
-                if (t.jenis === 'MASUK') tIn += Number(t.nominal);
-                else tOut += Number(t.nominal);
-
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50 transition-colors group";
-                row.innerHTML = `
-                    <td class="px-6 py-4 text-[10px] font-bold text-slate-400 whitespace-nowrap">${t.tanggal.split('-').reverse().join('/')}</td>
-                    <td class="px-6 py-4 text-[11px] font-bold text-slate-700 uppercase">${t.keterangan}</td>
-                    <td class="px-6 py-4 text-[11px] font-bold text-green-600 text-right">${t.jenis === 'MASUK' ? formatCurrency(t.nominal).replace('Rp', '') : '-'}</td>
-                    <td class="px-6 py-4 text-[11px] font-bold text-red-500 text-right">${t.jenis === 'KELUAR' ? formatCurrency(t.nominal).replace('Rp', '') : '-'}</td>
-                    <td class="px-6 py-4 text-r
-
-
-
-
+</body>
+</html>
