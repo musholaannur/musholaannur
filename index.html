@@ -100,12 +100,16 @@ body {
     font-weight:900;
     color:#ef4444;
 }
+/* Style tambahan untuk kolom saldo baru */
+.saldo-col {
+    font-weight: 900;
+    color: #1e40af;
+}
 </style>
 </head>
 
 <body>
 
-<!-- ================= STRUKTUR TAKMIR ================= -->
 <div class="struktur-wrapper">
 <div class="struktur-container">
 
@@ -132,7 +136,7 @@ Bp. Mualif<br>Bp. Rokim, Bp. Mukarom<br>Bp. Fafa (Mas Wo)</div>
 <div class="box"><strong>Bendahara 2</strong><br>Ibu Ratna</div>
 </div>
 
-<div<div class="section-row">
+<div class="section-row">
 <div class="box"><strong>Seksi Keamanan</strong><br>Bp. Heru Prasetyo<br>Bp. Puguh</div>
 <div class="box"><strong>Seksi Perawatan</strong><br>Bp. Ipin<br>Bp. Widodo</div>
 <div class="box"><strong>Seksi Kegiatan</strong><br>Bp. Yatiran<br>Bp. Kardiyo<br>Ibu Nurul<br>Ibu Sumiaton<br>Sdri. Maya</div>
@@ -147,7 +151,6 @@ Sdri. Yopi, Sdri. Wulan, Dkk<br>
 </div>
 </div>
 
-<!-- ================= LAPORAN INFAQ ================= -->
 <div class="p-4 md:p-6 lg:p-8">
 <div class="max-w-7xl mx-auto space-y-4">
 
@@ -160,18 +163,18 @@ LAPORAN INFAQ DIGITAL SYSTEM
 
 <div class="gradient-blue p-10 rounded-[2.5rem] text-white text-center shadow-2xl">
 <p class="text-xs font-black uppercase tracking-widest">Saldo Infaq Saat Ini</p>
-<h2 class="text-5xl font-black tracking-tighter" id="totalBalance">Rp 178.200</h2>
+<h2 class="text-5xl font-black tracking-tighter" id="totalBalance">Rp 0</h2>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <div class="bg-white p-8 rounded-[2rem] border-l-[10px] border-[#10b981] shadow-custom">
 <p class="text-xs font-black text-gray-400 uppercase">Total Pemasukan</p>
-<p class="text-3xl font-black text-[#10b981]" id="totalIncome">Rp 1.335.000</p>
+<p class="text-3xl font-black text-[#10b981]" id="totalIncome">Rp 0</p>
 </div>
 
 <div class="bg-white p-8 rounded-[2rem] border-l-[10px] border-[#ef4444] shadow-custom">
 <p class="text-xs font-black text-gray-400 uppercase">Total Pengeluaran</p>
-<p class="text-3xl font-black text-[#ef4444]" id="totalExpense">Rp 1.156.800</p>
+<p class="text-3xl font-black text-[#ef4444]" id="totalExpense">Rp 0</p>
 </div>
 </div>
 
@@ -179,7 +182,7 @@ LAPORAN INFAQ DIGITAL SYSTEM
 <h3 class="mutasi-title text-[#166534] mb-6 uppercase">Laporan Mutasi Infaq</h3>
 
 <div class="overflow-x-auto">
-<table class="w-full text-left min-w-[800px]">
+<table class="w-full text-left min-w-[900px]">
 
 <thead class="mutasi-head border-b-4">
 <tr>
@@ -187,7 +190,7 @@ LAPORAN INFAQ DIGITAL SYSTEM
 <th class="pb-4">KETERANGAN</th>
 <th class="pb-4 text-right">MASUK</th>
 <th class="pb-4 text-right">KELUAR</th>
-</tr>
+<th class="pb-4 text-right">SALDO</th> </tr>
 </thead>
 
 <tbody id="transactionList" class="mutasi-body">
@@ -197,13 +200,14 @@ LAPORAN INFAQ DIGITAL SYSTEM
 <td class="mutasi-ket">SALDO INFAQ AWAL</td>
 <td class="text-right mutasi-masuk">Rp 1.000.000</td>
 <td class="text-right">-</td>
-</tr>
+<td class="text-right saldo-col">Rp 0</td> </tr>
 
 <tr>
 <td class="mutasi-date">23/11/2025</td>
 <td class="mutasi-ket">HAMBA ALLAH</td>
 <td class="text-right mutasi-masuk">Rp 50.000</td>
 <td class="text-right">-</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -216,6 +220,7 @@ Lihat Foto Nota
 </td>
 <td class="text-right">-</td>
 <td class="text-right mutasi-keluar">Rp 400.000</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -228,6 +233,7 @@ Lihat Foto Nota
 </td>
 <td class="text-right">-</td>
 <td class="text-right mutasi-keluar">Rp 90.000</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -235,6 +241,7 @@ Lihat Foto Nota
 <td class="mutasi-ket">HAMBA ALLAH</td>
 <td class="text-right mutasi-masuk">Rp 150.000</td>
 <td class="text-right">-</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -247,6 +254,7 @@ Lihat Foto Nota
 </td>
 <td class="text-right">-</td>
 <td class="text-right mutasi-keluar">Rp 360.000</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -259,6 +267,7 @@ Lihat Foto Nota
 </td>
 <td class="text-right">-</td>
 <td class="text-right mutasi-keluar">Rp 58.000</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -266,6 +275,7 @@ Lihat Foto Nota
 <td class="mutasi-ket">HAMBA ALLAH</td>
 <td class="text-right mutasi-masuk">Rp 50.000</td>
 <td class="text-right">-</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -278,6 +288,7 @@ Lihat Foto Nota
 </td>
 <td class="text-right">-</td>
 <td class="text-right mutasi-keluar">Rp 159.000</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -290,6 +301,7 @@ Lihat Foto Nota
 </td>
 <td class="text-right">-</td>
 <td class="text-right mutasi-keluar">Rp 89.800</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -297,6 +309,7 @@ Lihat Foto Nota
 <td class="mutasi-ket">INFAQ MEGENGAN IBU IBU</td>
 <td class="text-right mutasi-masuk">Rp 65.000</td>
 <td class="text-right">-</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 <tr>
@@ -304,6 +317,7 @@ Lihat Foto Nota
 <td class="mutasi-ket">INFAQ MEGENGAN BAPAK BAPAK</td>
 <td class="text-right mutasi-masuk">Rp 20.000</td>
 <td class="text-right">-</td>
+<td class="text-right saldo-col">Rp 0</td>
 </tr>
 
 </tbody>
@@ -324,12 +338,27 @@ function formatRupiah(num) {
 function calculateTotals() {
   let totalIncome = 0;
   let totalExpense = 0;
+  let runningBalance = 0; // Tambahan variabel untuk hitung saldo per baris
+
   document.querySelectorAll("#transactionList tr").forEach(row => {
     const masuk = row.children[2].innerText;
     const keluar = row.children[3].innerText;
-    totalIncome += parseRupiah(masuk);
-    totalExpense += parseRupiah(keluar);
+    
+    const masukVal = parseRupiah(masuk);
+    const keluarVal = parseRupiah(keluar);
+
+    totalIncome += masukVal;
+    totalExpense += keluarVal;
+    
+    // Hitung saldo akumulatif per baris
+    runningBalance += (masukVal - keluarVal);
+    
+    // Tampilkan saldo di kolom ke-5 (index 4)
+    if(row.children[4]) {
+      row.children[4].innerText = formatRupiah(runningBalance);
+    }
   });
+
   const balance = totalIncome - totalExpense;
   document.getElementById("totalIncome").innerText = formatRupiah(totalIncome);
   document.getElementById("totalExpense").innerText = formatRupiah(totalExpense);
