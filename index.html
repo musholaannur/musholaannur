@@ -14,6 +14,7 @@ body {
     font-family: 'Inter', sans-serif; 
     background:#f8fafc; 
     color:#0f172a; 
+    overflow-x: hidden; /* Mencegah scroll horizontal akibat efek salju */
 }
 
 /* STRUKTUR TAKMIR */
@@ -100,10 +101,36 @@ body {
     font-weight:900;
     color:#ef4444;
 }
-/* Style tambahan untuk kolom saldo baru */
 .saldo-col {
     font-weight: 900;
     color: #1e40af;
+}
+
+/* STYLE EFEK SALJU */
+.snowflake {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.5em;
+    position: fixed;
+    top: -10%;
+    z-index: 9999;
+    user-select: none;
+    cursor: default;
+    pointer-events: none; /* Agar tidak menghalangi klik pada tombol/link */
+    animation-name: snowflakes-fall, snowflakes-shake;
+    animation-duration: 10s, 3s;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
+    animation-play-state: running, running;
+}
+
+@keyframes snowflakes-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
+}
+
+@keyframes snowflakes-shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    50% { transform: translateX(80px) rotate(180deg); }
 }
 </style>
 </head>
@@ -328,7 +355,10 @@ Lihat Foto Nota
 </div>
 </div>
 
+<div id="snow-container" aria-hidden="true"></div>
+
 <script>
+/* KODE ASLI PERHITUNGAN SALDO */
 function parseRupiah(text) {
   return parseInt(text.replace(/[^0-9]/g, '')) || 0;
 }
@@ -338,7 +368,7 @@ function formatRupiah(num) {
 function calculateTotals() {
   let totalIncome = 0;
   let totalExpense = 0;
-  let runningBalance = 0; // Tambahan variabel untuk hitung saldo per baris
+  let runningBalance = 0;
 
   document.querySelectorAll("#transactionList tr").forEach(row => {
     const masuk = row.children[2].innerText;
@@ -350,10 +380,8 @@ function calculateTotals() {
     totalIncome += masukVal;
     totalExpense += keluarVal;
     
-    // Hitung saldo akumulatif per baris
     runningBalance += (masukVal - keluarVal);
     
-    // Tampilkan saldo di kolom ke-5 (index 4)
     if(row.children[4]) {
       row.children[4].innerText = formatRupiah(runningBalance);
     }
@@ -365,6 +393,34 @@ function calculateTotals() {
   document.getElementById("totalBalance").innerText = formatRupiah(balance);
 }
 calculateTotals();
+
+/* TAMBAHAN KODE: EFEK SALJU BATIK SEGI ENAM */
+function createSnowflake() {
+    const snowflakeChars = ['❄', '❅', '❆', '✻', '✽']; 
+    const container = document.getElementById('snow-container');
+    const flake = document.createElement('div');
+    
+    flake.className = 'snowflake';
+    flake.innerText = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+    
+    flake.style.left = Math.random() * 100 + 'vw';
+    
+    const size = (Math.random() * 1.5) + 0.5 + 'em';
+    flake.style.fontSize = size;
+    flake.style.opacity = Math.random();
+    
+    const duration = (Math.random() * 8) + 7 + 's';
+    const delay = Math.random() * 5 + 's';
+    flake.style.animationDuration = duration + ', 3s';
+    flake.style.animationDelay = delay + ', ' + delay;
+
+    container.appendChild(flake);
+
+    setTimeout(() => {
+      flake.remove();
+    }, 15000);
+}
+setInterval(createSnowflake, 400);
 </script>
 
 </body>
