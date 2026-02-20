@@ -88,52 +88,63 @@
         .mutasi-keluar{ font-weight:900; color:#ef4444; }
         .saldo-col { font-weight: 900; color: #1e40af; }
 
-        /* --- WIFI ONLINE SYSTEM CSS (FONT UPDATED) --- */
-        .wifi-container{
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            gap:8px;
-            color:#4ade80; 
+        /* --- WIFI ONLINE SYSTEM CSS (TRUE NEON GREEN - NO SHADOWS) --- */
+        .wifi-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 12px;
+            /* Hijau Neon Murni */
+            color: #00ff00; 
         }
         .wifi-text {
             font-family: 'Inter', sans-serif;
-            font-size: 0.75rem; /* text-xs */
-            font-weight: 900; /* font-black */
+            font-size: 0.75rem; 
+            font-weight: 900; 
             text-transform: uppercase;
-            letter-spacing: 0.1em; /* tracking-widest */
+            letter-spacing: 0.15em;
+            /* Warna Teks Hijau Neon Tanpa Bayangan Hitam */
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
         }
-        .wifi-icon{
-            width:22px;
-            height:22px;
-            position:relative;
+        .wifi-icon {
+            width: 22px;
+            height: 22px;
+            position: relative;
+            color: #00ff00;
+            filter: drop-shadow(0 0 5px #00ff00);
         }
-        .icon-blink{ animation: blink 1s infinite; }
-        @keyframes blink{ 0%{opacity:1;} 50%{opacity:0.3;} 100%{opacity:1;} }
+        .icon-blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0.2; }
+        }
         
-        .wifi-icon::before{
-            content:"";
-            position:absolute;
-            top:50%; left:50%;
-            width:4px; height:4px;
-            background:currentColor;
-            border-radius:50%;
-            transform:translate(-50%,-50%);
-            animation: radarDot 1.5s infinite;
+        .wifi-icon::before {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 5px; height: 5px;
+            background: #00ff00;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
         }
-        .wifi-icon::after{
-            content:"";
-            position:absolute;
-            top:50%; left:50%;
-            width:6px; height:6px;
-            border:2px solid currentColor;
-            border-radius:50%;
-            transform:translate(-50%,-50%);
-            animation: radarWave 1.5s infinite;
+        .wifi-icon::after {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 6px; height: 6px;
+            border: 2px solid #00ff00;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: radar 1.5s infinite;
         }
-        @keyframes radarWave{ 0%{transform:translate(-50%,-50%) scale(0.5); opacity:0.8;} 100%{transform:translate(-50%,-50%) scale(2.5); opacity:0;} }
-        @keyframes radarDot{ 0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7);} 100%{box-shadow:0 0 0 10px rgba(74,222,128,0);} }
+        @keyframes radar {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+        }
 
         /* --- EFEK SALJU CSS --- */
         .snowflake {
@@ -326,7 +337,6 @@
     <div id="snow-container" aria-hidden="true"></div>
 
     <script>
-        /* SCRIPT PERHITUNGAN OTOMATIS */
         function parseRupiah(text) { return parseInt(text.replace(/[^0-9]/g, '')) || 0; }
         function formatRupiah(num) { return "Rp " + num.toLocaleString("id-ID"); }
 
@@ -356,7 +366,6 @@
         }
         calculateTotals();
 
-        /* SCRIPT EFEK SALJU */
         function createSnowflake() {
             const snowflakeChars = ['❄', '❅', '❆', '✻', '✽']; 
             const container = document.getElementById('snow-container');
