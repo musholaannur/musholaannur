@@ -392,5 +392,27 @@
             document.getElementById("totalBalance").innerText = formatRupiah(totalIncome - totalExpense);
         }
         calculateTotals();
+        function createSnowflake() {
+            const snowflakeChars = ['❄', '❅', '❆', '✻', '✽']; 
+            const container = document.getElementById('snow-container');
+            const flake = document.createElement('div');
+            flake.className = 'snowflake';
+            flake.innerText = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+            flake.style.left = Math.random() * 100 + 'vw';
+            const size = (Math.random() * 1.5) + 0.5 + 'em';
+            flake.style.fontSize = size;
+            flake.style.opacity = Math.random();
+            const duration = (Math.random() * 8) + 7 + 's';
+            const delay = Math.random() * 5 + 's';
+            flake.style.animationDuration = duration + ', 3s';
+            flake.style.animationDelay = delay + ', ' + delay;
+            container.appendChild(flake);
+            setTimeout(() => { flake.remove(); }, 15000);
+        }
+        setInterval(createSnowflake, 400);
+    </script>
+
+</body>
+</html>
 
         
