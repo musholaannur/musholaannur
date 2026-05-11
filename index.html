@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -342,11 +343,18 @@
                             </tr>
  <tr>
                                 <td class="mutasi-date">17/03/2026</td>
-                                <td class="mutasi-ket">CETAK BANNER SELAMAT HARI RAYA IDUL FITRI<br><a href="https://drive.google.com/file/d/14r9uI6FDP3j3k1cvCuMZUtPYaSmb2gJJ/view?usp=sharing" target="_blank" class="text-blue-600 underline text-sm">Lihat Foto Nota</a></td>
+                                <td class="mutasi-ket">CETAK BANNER SELAMAT HARI RAYA IDUL FITRI<br><a href="https://drive.google.com/file/d/1BGrYV-76j-EdCn7-aZq6ytaaKxCck3iJ/view?usp=sharing" target="_blank" class="text-blue-600 underline text-sm">Lihat Foto Nota</a></td>
                                 <td class="text-right">-</td>
                                 <td class="text-right mutasi-keluar">Rp 89.800</td>
                                 <td class="text-right saldo-col">Rp 0</td>
                             </tr>
+<tr>
+    <td class="mutasi-date">11/05/2026</td>
+    <td class="mutasi-ket">HAMBA ALLAH</td>
+    <td class="text-right mutasi-masuk">Rp 50.000</td>
+    <td class="text-right">-</td>
+    <td class="text-right saldo-col">Rp 0</td>
+</tr>
 
                         </tbody>
                     </table>
@@ -388,11 +396,12 @@
             });
 
             document.getElementById("totalIncome").innerText = formatRupiah(totalIncome);
-            document.getElementById("totalExpense").innerText = formatRupiah(totalExpense);
+                    document.getElementById("totalExpense").innerText = formatRupiah(totalExpense);
             document.getElementById("totalBalance").innerText = formatRupiah(totalIncome - totalExpense);
         }
         calculateTotals();
-        function createSnowflake() {
+
+function createSnowflake() {
             const snowflakeChars = ['❄', '❅', '❆', '✻', '✽']; 
             const container = document.getElementById('snow-container');
             const flake = document.createElement('div');
@@ -414,5 +423,3 @@
 
 </body>
 </html>
-
-        
