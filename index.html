@@ -256,6 +256,71 @@
         .logo-terbang {
             animation: logoMelayang 4s ease-in-out infinite;
         }
+
+        /* --- MEDIA PRINT UNTUK CETAK/PDF --- */
+        @media print {
+            /* Memaksa browser mencetak warna latar belakang dan gambar */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            /* Mengatur margin kertas cetak */
+            @page {
+                margin: 10mm;
+                size: auto;
+            }
+            
+            /* Menghilangkan elemen interaktif yang tidak perlu dicetak */
+            button, 
+            #transaction-modal, 
+            #pin-modal, 
+            .snowflake, 
+            #snow-container,
+            [id$="-status"],
+            .md\:col-span-1.justify-center.shrink-0 { /* Sembunyikan ikon sampah di desktop */
+                display: none !important;
+            }
+            
+            /* Sembunyikan tombol sampah di tampilan mobile */
+            button[onclick*="requestAccess('delete'"] {
+                display: none !important;
+            }
+            
+            /* Memastikan container utama melebar penuh dan rapi */
+            body {
+                background-color: #f4f7f5 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .w-full {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            /* Mempertahankan visual box pengurus */
+            .struktur-container {
+                background-color: #2563eb !important;
+                border: 20px solid #2563eb !important; /* Disesuaikan agar muat saat diprint */
+            }
+            
+            .struktur-inner {
+                background-color: #ffffff !important;
+            }
+            
+            .struktur-container .box {
+                background-color: rgba(16, 185, 129, 0.1) !important;
+                border: 4px solid #10b981 !important;
+            }
+            
+            /* Menghindari pemotongan baris di tengah tabel mutasi saat berpindah halaman */
+            #mutasi-list > div {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen py-4 px-3 md:py-6 md:px-8 flex justify-center items-start">
