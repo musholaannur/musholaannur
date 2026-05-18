@@ -30,7 +30,7 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #0b3f27;
         }
-
+        
         /* CSS STRUKTUR PENGURUS - BORDER LUAR KOTAK PENUH (KOTAK SIKU-SIKU) */
         .struktur-wrapper {
             width: 100%;
@@ -58,7 +58,7 @@
             align-items: center;
             box-sizing: border-box;
         }
-
+        
         /* JUDUL STRUKTUR BESAR & RESPONSIVE OTOMATIS */
         .judul-struktur-utama {
             font-size: clamp(24px, 4.5vw, 44px) !important;
@@ -80,7 +80,7 @@
             margin: 4px 0 16px 0;
             text-align: center;
         }
-
+        
         /* Layout Fleksibel Utama */
         .struktur-row {
             display: flex;
@@ -90,7 +90,7 @@
             align-items: center;
             width: 100%;
         }
-
+        
         /* KOTAK HIJAU - Dioptimalkan untuk Mobile & Desktop */
         .struktur-container .box {
             background-color: rgba(16, 185, 129, 0.1);
@@ -113,7 +113,7 @@
             box-sizing: border-box;
             transition: all 0.2s ease;
         }
-
+        
         /* Teks Jabatan CAPITAL FULL BOLD - DIPASTIKAN SELALU 1 BARIS */
         .struktur-container .box strong {
             color: #0b6640;
@@ -125,7 +125,7 @@
             text-transform: uppercase;
             white-space: nowrap !important;
         }
-
+        
         /* OTOMATISASI RESPONSIVE MODE DESKTOP & MOBILE */
         @media (min-width: 768px) {
             .struktur-inner {
@@ -175,7 +175,7 @@
                 min-height: auto;
             }
         }
-
+        
         /* Efek Kedip Radar Sonar Khas Aplikasi Sistem */
         .radar-pulse {
             position: relative;
@@ -208,7 +208,7 @@
                 box-shadow: 0 0 12px #00FF66;
             }
         }
-
+        
         /* --- EFEK SALJU CSS --- */
         .snowflake {
             color: rgba(255, 255, 255, 0.5);
@@ -309,7 +309,7 @@
         <div class="bg-[#2563eb] text-white text-center py-7 md:py-10 rounded-3xl shadow-md relative overflow-hidden flex items-center justify-between px-4 md:px-10">
             <!-- Logo 1 Rata Kiri -->
             <div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24 flex items-center justify-center">
-                <img src="https://lh3.googleusercontent.com/d/12Fq-1Non8wuie0N7Qvvi6UoToZeTgsX7" alt="Logo Kiri" class="w-full h-full object-contain">
+                <img src="https://lh3.googleusercontent.com/d/12Fq-1Non8wuie0N7Qvvi6UoToZeTgsX7" alt="Logo Kiri" class="w-full h-full object-contain" style="filter: drop-shadow(0px 10px 8px rgba(0, 0, 0, 0.45));">
             </div>
             
             <!-- Konten Tengah -->
@@ -326,7 +326,7 @@
             
             <!-- Logo 2 Rata Kanan -->
             <div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24 flex items-center justify-center">
-                <img src="https://lh3.googleusercontent.com/d/19d7WpltUXzREJVO5AekEsqwjonJk_v1y" alt="Logo Kanan" class="w-full h-full object-contain">
+                <img src="https://lh3.googleusercontent.com/d/19d7WpltUXzREJVO5AekEsqwjonJk_v1y" alt="Logo Kanan" class="w-full h-full object-contain" style="filter: drop-shadow(0px 10px 8px rgba(0, 0, 0, 0.45));">
             </div>
         </div>
 
@@ -495,6 +495,7 @@
             localStorage.setItem("INFAQ_AN_NUR_DATABASE", JSON.stringify(currentDatabase));
         }
 
+        // Memuat database lokal cadangan
         function loadFromLocalStorage() {
             const localData = localStorage.getItem("INFAQ_AN_NUR_DATABASE");
             if (localData) {
@@ -561,6 +562,7 @@
             let runningSaldo = 0;
             let totalMasuk = 0;
             let totalKeluar = 0;
+            
             rows.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
             
             rows.forEach((item, index) => {
@@ -608,7 +610,7 @@
                     </div>
                     <div class="hidden md:flex md:col-span-1 justify-center shrink-0">
                         <button onclick="requestAccess('delete', ${index})" class="text-rose-500 hover:text-rose-600 transition p-1" title="Hapus">
-                            <svg xmlns="http://www.w3.org/2000/xl" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            <svg xmlns="http://www.w3.org/200xl" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                     </div>
                 `;
@@ -729,7 +731,6 @@
                 masuk: targetData.masuk,
                 keluar: targetData.keluar
             };
-            
             currentDatabase.splice(index, 1);
             saveToLocalStorage();
             renderData(currentDatabase);
