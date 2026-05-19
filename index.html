@@ -595,7 +595,8 @@
                 
                 let notaHtml = "";
                 if (item.nota && item.nota.trim() !== "") {
-                    notaHtml = `<div class="block w-full mt-0.5 ml-[72px] md:ml-0"><a href="${item.nota}" target="_blank" class="text-[10px] md:text-[11px] text-blue-600 hover:underline inline-block tracking-wide bg-blue-50 md:bg-transparent px-2 py-0.5 md:p-0 rounded border border-blue-200 md:border-0">Lihat Foto Nota</a></div>`;
+                    // Di-render bersih tanpa margin manual bawaan cetak lama agar flex-col mobile merapat lurus otomatis ke tepi kiri kontainer
+                    notaHtml = `<div class="block w-full mt-1 text-left md:ml-0"><a href="${item.nota}" target="_blank" class="text-[10px] md:text-[11px] text-blue-600 hover:underline inline-block tracking-wide bg-blue-50 md:bg-transparent px-2 py-0.5 md:p-0 rounded border border-blue-200 md:border-0">Lihat Foto Nota</a></div>`;
                 }
                 
                 rowContainer.innerHTML = `
@@ -607,11 +608,25 @@
                         </button>
                     </div>
                     <div class="md:col-span-4 text-slate-700 uppercase leading-tight text-xs md:text-sm flex flex-col items-start justify-center md:px-4 min-w-0">
-                        <div class="flex items-start w-full justify-between md:justify-start">
+                        <!-- Tampilan Khusus Mobile: Struktur Kotak Vertikal Rata Kiri Total Presisi -->
+                        <div class="flex flex-col items-start justify-start w-full text-left md:hidden">
+                            <div class="w-full flex items-start justify-start m-0 p-0">
+                                <span class="text-slate-400 uppercase text-[9px] block shrink-0 pt-[2px] mr-1">Keterangan:</span>
+                                <div class="flex-1 flex flex-col items-start justify-start m-0 p-0 text-left">
+                                    <span class="text-left break-all w-full block">${item.keterangan}</span>
+                                    ${notaHtml}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Layout Bawaan Desktop Asli (Kembali 100% Sesuai Kode Utama Anda) -->
+                        <div class="hidden md:flex md:items-start md:w-full md:justify-start">
                             <span class="md:hidden text-slate-400 uppercase text-[9px] mr-2 block shrink-0 pt-[1px]">Keterangan:</span>
                             <span class="flex-1 md:flex-none text-left break-all">${item.keterangan}</span>
                         </div>
-                        ${notaHtml}
+                        <div class="hidden md:block">
+                            ${notaHtml}
+                        </div>
                     </div>
                     <div class="md:col-span-2 md:text-right text-[#10b981] text-xs md:text-sm flex justify-between md:justify-end md:pr-4 whitespace-nowrap min-w-0 flex-1 md:shrink-0">
                         <span class="md:hidden text-slate-400 uppercase text-[9px]">Masuk (+):</span>
