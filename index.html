@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mushola Wakaf An-Nur - Laporan Infaq Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -10,7 +10,18 @@
         /* Memaksa seluruh teks di dalam aplikasi menggunakan ketebalan bold tebal/tegas */
         * {
             font-weight: 900 !important;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
+        
+        html, body {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f4f7f5;
@@ -31,13 +42,28 @@
             background: #0b3f27;
         }
         
-        /* CSS STRUKTUR PENGURUS - BORDER LUAR KOTAK PENUH (KOTAK SIKU-SIKU) */
-        .struktur-wrapper {
+        /* CONTAINER ANTI-SCROLL: Memotong area gaib sisa transformasi skala di HP */
+        .outer-overflow-hadang {
             width: 100%;
+            overflow: hidden;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            padding: 0;
             margin-bottom: 4px;
         }
+        
+        /* WRAPPER UTAMA - Dikunci pada ukuran layout desktop (Kanvas Utama) */
+        .struktur-wrapper {
+            width: 1400px; /* Dikunci agar susunan kotak tidak patah ke bawah di HP */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            transform-origin: top center;
+            flex-shrink: 0;
+        }
+
+        /* CONTAINER BINGKAI BIRU */
         .struktur-container {
             width: 100%;
             background-color: #2563eb;
@@ -45,135 +71,118 @@
             border-radius: 0px;
             padding: 0px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box;
         }
+
         .struktur-inner {
             width: 100%;
             background-color: #ffffff;
             border-radius: 40px;
-            padding: 32px 16px;
+            padding: 56px 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 32px;
             align-items: center;
-            box-sizing: border-box;
         }
         
-        /* JUDUL STRUKTUR BESAR & RESPONSIVE OTOMATIS */
+        /* JUDUL STRUKTUR BESAR ULTRA TEBAL */
         .judul-struktur-utama {
-            font-size: clamp(24px, 4.5vw, 44px) !important;
+            font-size: 46px !important;
             line-height: 1.2 !important;
             font-weight: 900 !important;
             color: #1d3557;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             text-transform: uppercase;
             margin: 0;
             text-align: center;
         }
         .sub-judul-struktur {
-            font-size: clamp(16px, 3vw, 24px) !important;
+            font-size: 26px !important;
             line-height: 1.3 !important;
             font-weight: 900 !important;
             color: #1d3557;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             text-transform: uppercase;
             margin: 4px 0 16px 0;
             text-align: center;
         }
         
-        /* Layout Fleksibel Utama */
+        /* Layout Baris - Dikunci selalu horizontal sejajar ke samping */
         .struktur-row {
             display: flex;
-            flex-direction: column;
-            gap: 16px;
-            justify-content: center;
-            align-items: center;
+            flex-direction: row; 
+            flex-wrap: wrap;
             width: 100%;
+            max-width: 1400px;
+            gap: 20px;
+            align-items: stretch; /* Memaksa tinggi kotak sebaris rata seimbang */
+            justify-content: center;
         }
         
-        /* KOTAK HIJAU - Dioptimalkan untuk Mobile & Desktop */
+        /* KOTAK HIJAU */
         .struktur-container .box {
             background-color: rgba(16, 185, 129, 0.1);
             border: 4px solid #10b981;
             border-radius: 14px;
-            padding: 14px 16px;
-            font-size: clamp(15px, 3.5vw, 18px);
-            line-height: 1.4;
+            padding: 18px 20px;
+            font-size: 21px; /* Ukuran nama diperbesar tebal jernih */
+            font-weight: 900 !important; 
+            line-height: 1.5;
             color: #0b6640;
-            font-weight: 900 !important;
-            box-shadow: 0 0 20px rgba(0, 255, 102, 0.8), 0 0 8px rgba(0, 255, 102, 0.4);
+            text-shadow: 0 0 1px rgba(11, 102, 64, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.4), 0 0 8px rgba(0, 255, 102, 0.2);
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: flex-start; /* Presisi Rata Atas */
             align-items: center;
             text-align: center;
-            min-height: 90px;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
+            flex-shrink: 0;
         }
         
-        /* Teks Jabatan CAPITAL FULL BOLD - DIPASTIKAN SELALU 1 BARIS */
+        /* TEKS JABATAN - ULTRA MAX BOLD & RATA ATAS */
         .struktur-container .box strong {
             color: #0b6640;
             font-weight: 900 !important;
-            font-size: clamp(18px, 4vw, 22px);
-            margin-bottom: 4px;
+            font-size: 26px; /* Ukuran jabatan diperbesar dominan */
+            line-height: 1.2 !important;
+            margin-bottom: 8px;
+            align-self: stretch;
             display: block;
             text-align: center;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 1px rgba(11, 102, 64, 0.4);
             white-space: nowrap !important;
         }
         
-        /* OTOMATISASI RESPONSIVE MODE DESKTOP & MOBILE */
-        @media (min-width: 768px) {
-            .struktur-inner {
-                padding: 40px 24px;
-                gap: 24px;
-            }
-            .struktur-row {
-                flex-direction: row;
-                flex-wrap: wrap;
-                max-width: 950px;
-                gap: 20px;
-                align-items: stretch;
-            }
-            .row-1 .box {
-                flex: 1;
-                min-width: 220px;
-                max-width: 280px;
-                min-height: auto;
-            }
-            .row-2 .box {
-                flex: 1;
-                min-width: 190px;
-                max-width: 230px;
-                min-height: auto;
-            }
-            .row-3 .box {
-                flex: 1;
-                min-width: 190px;
-                max-width: 230px;
-                min-height: auto;
-            }
-            .row-4 .box-keamanan, .row-4 .box-perawatan, .row-4 .box-kegiatan {
-                flex: 1.5;
-                min-width: 220px;
-                max-width: 280px;
-                min-height: auto;
-            }
-            .row-4 .box-kebersihan {
-                flex: 1.2;
-                min-width: 220px;
-                max-width: 260px;
-                min-height: auto;
-            }
-            .row-5 .box {
-                width: 100%;
-                max-width: 360px;
-                min-height: auto;
-            }
+        /* PEMBAGIAN STRUKTUR ASLI DESKTOP ANDA */
+        .row-1 .box {
+            flex: 1;
+            min-width: 250px;
+            max-width: 330px;
+        }
+        .row-2 .box {
+            flex: 1;
+            min-width: 220px;
+            max-width: 280px;
+        }
+        .row-3 .box {
+            flex: 1;
+            min-width: 220px;
+            max-width: 280px;
+        }
+        .row-4 .box-keamanan, .row-4 .box-perawatan, .row-4 .box-kegiatan {
+            flex: 1.5;
+            min-width: 250px;
+            max-width: 330px;
+        }
+        .row-4 .box-kebersihan {
+            flex: 1.2;
+            min-width: 250px;
+            max-width: 300px;
+        }
+        .row-5 .box {
+            width: 100%;
+            max-width: 650px;
         }
         
         /* Efek Kedip Radar Sonar Khas Aplikasi Sistem */
@@ -258,56 +267,56 @@
         }
     </style>
 </head>
-<body class="min-h-screen py-4 px-3 md:py-6 md:px-8 flex justify-center items-start">
+<body class="min-h-screen py-4 px-3 md:py-6 md:px-8 flex flex-col items-center justify-start">
 
     <div id="snow-container"></div>
 
     <div class="w-full max-w-6xl flex flex-col gap-4 relative z-10">
         
-        <!-- Struktur Pengurus -->
-        <div class="struktur-wrapper">
-            <div class="struktur-container">
-                <div class="struktur-inner">
-                    <h1 class="judul-struktur-utama">STRUKTUR PENGURUS TAKMIR</h1>
-                    <h2 class="sub-judul-struktur">MUSHOLA WAKAF AN-NUR</h2>
-                    
-                    <div class="struktur-row row-1">
-                        <div class="box"><strong>Ketua</strong>Bp. Purnomo</div>
-                        <div class="box"><strong>Wakil Ketua</strong>Bp. Anton</div>
-                        <div class="box"><strong>Penasehat</strong>Bp. Mualif<br>Bp. Rokim, Bp. Mukarom<br>Bp. Fafa (Mas Wo)</div>
-                    </div>
-                    
-                    <div class="struktur-row row-2">
-                        <div class="box"><strong>Sekretaris</strong>Bp. Sujatmoko</div>
-                        <div class="box"><strong>Wakil Sekretaris</strong>Sdri. Nadia</div>
-                    </div>
-                    
-                    <div class="struktur-row row-3">
-                        <div class="box"><strong>Bendahara I</strong>Bp. Budi</div>
-                        <div class="box"><strong>Bendahara II</strong>Ibu Ratna</div>
-                    </div>
-                    
-                    <div class="struktur-row row-4">
-                        <div class="box box-keamanan"><strong>Seksi Keamanan</strong>Bp. Heru Prasetyo<br>Bp. Puguh</div>
-                        <div class="box box-perawatan"><strong>Seksi Perawatan</strong>Bp. Ipin<br>Bp. Widodo<br>Bp. Suparno<br>Bp. Doni</div>
-                        <div class="box box-kegiatan"><strong>Seksi Kegiatan</strong>Bp. Yatiran<br>Bp. Kardiyo<br>Ibu Nurul<br>Ibu Sumiaton<br>Sdri. Maya</div>
-                        <div class="box box-kebersihan"><strong>Seksi Kebersihan</strong>Bp. Dwiyani<br>Bp. Sutikno</div>
-                    </div>
-                    
-                    <div class="struktur-row row-5">
-                        <div class="box">
-                            <strong>Seksi Remaja Mushola</strong>
-                            Sdr. Vicky | Sdr. Azam<br>
-                            Sdr. Ibra | Sdr. Cilo<br>
-                            Sdr. Rizky | Sdr. Faris.<br>
-                            Sdri. Wulan, Sdri. Yopi, Dkk
+        <div class="outer-overflow-hadang" id="js-outer-hadang">
+            <div class="struktur-wrapper" id="js-responsive-wrapper">
+                <div class="struktur-container">
+                    <div class="struktur-inner">
+                        <h1 class="judul-struktur-utama">STRUKTUR PENGURUS TAKMIR</h1>
+                        <h2 class="sub-judul-struktur">MUSHOLA WAKAF AN-NUR</h2>
+                        
+                        <div class="struktur-row row-1">
+                            <div class="box"><strong>Ketua</strong>Bp. Purnomo</div>
+                            <div class="box"><strong>Wakil Ketua</strong>Bp. Anton</div>
+                            <div class="box"><strong>Penasehat</strong>Bp. Mualif<br>Bp. Rokim, Bp. Mukarom<br>Bp. Fafa (Mas Wo)</div>
+                        </div>
+                        
+                        <div class="struktur-row row-2">
+                            <div class="box"><strong>Sekretaris</strong>Bp. Sujatmoko</div>
+                            <div class="box"><strong>Wakil Sekretaris</strong>Sdri. Nadia</div>
+                        </div>
+                        
+                        <div class="struktur-row row-3">
+                            <div class="box"><strong>Bendahara I</strong>Bp. Budi</div>
+                            <div class="box"><strong>Bendahara II</strong>Ibu Ratna</div>
+                        </div>
+                        
+                        <div class="struktur-row row-4">
+                            <div class="box box-keamanan"><strong>Seksi Keamanan</strong>Bp. Heru Prasetyo<br>Bp. Puguh</div>
+                            <div class="box box-perawatan"><strong>Seksi Perawatan</strong>Bp. Ipin<br>Bp. Widodo<br>Bp. Suparno<br>Bp. Doni</div>
+                            <div class="box box-kegiatan"><strong>Seksi Kegiatan</strong>Bp. Yatiran<br>Bp. Kardiyo<br>Ibu Nurul<br>Ibu Sumiaton<br>Sdri. Maya</div>
+                            <div class="box box-kebersihan"><strong>Seksi Kebersihan</strong>Bp. Dwiyani<br>Bp. Sutikno</div>
+                        </div>
+                        
+                        <div class="struktur-row row-5">
+                            <div class="box">
+                                <strong>Seksi Remaja Mushola</strong>
+                                Sdr. Vicky | Sdr. Azam<br>
+                                Sdr. Ibra | Sdr. Cilo<br>
+                                Sdr. Rizky | Sdr. Faris.<br>
+                                Sdri. Wulan, Sdri. Yopi, Dkk
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Header Aplikasi -->
         <div class="bg-[#115e3b] text-center py-5 md:py-6 rounded-3xl shadow-sm px-4 flex flex-col gap-1 justify-center items-center overflow-hidden">
             <h1 class="text-white text-[4.8vw] md:text-2xl tracking-wider uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] whitespace-nowrap overflow-visible block w-full text-center">
                 MUSHOLA WAKAF AN-NUR
@@ -321,14 +330,11 @@
             </div>
         </div>
 
-        <!-- Saldo Utama -->
         <div class="bg-[#2563eb] text-white text-center py-7 md:py-10 rounded-3xl shadow-md relative overflow-hidden flex items-center justify-between px-4 md:px-10">
-            <!-- Logo Rata Kiri (Sebelumnya Logo Kanan) -->
             <div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24 flex items-center justify-center">
                 <img src="https://lh3.googleusercontent.com/d/19d7WpltUXzREJVO5AekEsqwjonJk_v1y" alt="Logo Kiri" class="w-full h-full object-contain logo-terbang" style="filter: drop-shadow(0px 12px 6px rgba(0, 0, 0, 0.45));">
             </div>
             
-            <!-- Konten Tengah -->
             <div class="flex-1 flex flex-col items-center justify-center px-2">
                 <div class="flex items-center justify-center gap-2 mb-2">
                     <div class="radar-pulse"></div>
@@ -340,13 +346,11 @@
                 <p id="total-saldo" class="text-4xl md:text-7xl tracking-tight text-white" style="text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.45);">Rp 0</p>
             </div>
             
-            <!-- Logo Rata Kanan (Sebelumnya Logo Kiri) -->
             <div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24 flex items-center justify-center">
                 <img src="https://lh3.googleusercontent.com/d/12Fq-1Non8wuie0N7Qvvi6UoToZeTgsX7" alt="Logo Kanan" class="w-full h-full object-contain logo-terbang" style="filter: drop-shadow(0px 12px 6px rgba(0, 0, 0, 0.45));">
             </div>
         </div>
 
-        <!-- Ringkasan Pemasukan & Pengeluaran -->
         <div class="grid grid-cols-2 gap-3">
             <div class="bg-white border border-slate-200/80 p-3 md:p-4 rounded-2xl shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 bottom-0 w-[4px] bg-[#10b981]"></div>
@@ -360,7 +364,6 @@
             </div>
         </div>
 
-        <!-- Tombol Input -->
         <button onclick="requestAccess('add')" class="w-full bg-[#10b981] hover:bg-[#059669] text-white py-3.5 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-sm tracking-wide text-xs md:text-sm uppercase">
             <svg xmlns="http://www.w3.org/2000/xl" class="h-4 w-4 text-emerald-100" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
@@ -368,7 +371,6 @@
             Input Data Baru
         </button>
 
-        <!-- Tabel Mutasi -->
         <div class="bg-white border border-slate-200 rounded-2xl p-3 md:p-6 shadow-sm overflow-hidden">
             <div class="flex justify-between items-center mb-4 w-full">
                 <h2 class="text-emerald-800 text-xs md:text-base tracking-wide uppercase border-b-2 border-[#115e3b] pb-0.5 font-black">LAPORAN MUTASI INFAQ</h2>
@@ -392,7 +394,6 @@
         </div>
     </div>
 
-    <!-- Modals Transaksi -->
     <div id="transaction-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-sm p-5 shadow-xl relative text-slate-800">
             <h3 id="modal-title" class="text-[#115e3b] text-sm uppercase mb-4">Input Data Infaq</h3>
@@ -430,8 +431,7 @@
         </div>
     </div>
 
-    <!-- Modals PIN -->
-    <div id="pin-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+    <div id="pin-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xs p-5 shadow-2xl relative text-slate-800 text-center">
             <div class="w-12 h-12 rounded-full bg-emerald-50 text-[#115e3b] flex items-center justify-center mx-auto mb-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -453,6 +453,35 @@
     </div>
 
     <script>
+        // Fungsi Auto Scaling Khusus Takmir (Diperbaiki agar membaca lebar box luar aplikasi)
+        function samakanDesktopDanMobile() {
+            const wrapper = document.getElementById('js-responsive-wrapper');
+            const outerHadang = document.getElementById('js-outer-hadang');
+            if(!wrapper || !outerHadang) return;
+            
+            const lebarLayar = outerHadang.clientWidth; // Membaca ruang bersih dari kontainer induk laporan
+            const lebarTarget = 1400; // Lebar patokan layout master desktop
+
+            if (lebarLayar < lebarTarget && lebarLayar > 0) {
+                const skala = lebarLayar / lebarTarget;
+                wrapper.style.transform = `scale(${skala})`;
+                const tinggiAsli = wrapper.offsetHeight;
+                const selisihTinggi = tinggiAsli * (1 - skala);
+                wrapper.style.marginBottom = `-${selisihTinggi}px`;
+            } else {
+                wrapper.style.transform = 'none';
+                wrapper.style.marginBottom = '0px';
+            }
+        }
+
+        window.addEventListener('load', samakanDesktopDanMobile);
+        window.addEventListener('resize', samakanDesktopDanMobile);
+        window.addEventListener('DOMContentLoaded', samakanDesktopDanMobile);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(samakanDesktopDanMobile, 200);
+        });
+
+        // Logika Aplikasi Kas Infaq Asli Anda
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxXHeovAbctksR4_iePWoyyLHN_tQ6tefG3VbeVAG4y49hQwdc6sPZ9alD_EzTGdDiMDw/exec";
         const SECURITY_PIN = "909";
         let currentDatabase = [];
@@ -571,10 +600,9 @@
             document.getElementById("transaction-modal").classList.add("hidden");
         }
 
-        htmlLayout = "";
-
         function renderData(rows) {
             const container = document.getElementById("mutasi-list");
+            if(!container) return;
             container.innerHTML = "";
             let runningSaldo = 0;
             let totalMasuk = 0;
@@ -595,7 +623,6 @@
                 
                 let notaHtml = "";
                 if (item.nota && item.nota.trim() !== "") {
-                    // Di-render bersih tanpa margin manual bawaan cetak lama agar flex-col mobile merapat lurus otomatis ke tepi kiri kontainer
                     notaHtml = `<div class="block w-full mt-1 text-left md:ml-0"><a href="${item.nota}" target="_blank" class="text-[10px] md:text-[11px] text-blue-600 hover:underline inline-block tracking-wide bg-blue-50 md:bg-transparent px-2 py-0.5 md:p-0 rounded border border-blue-200 md:border-0">Lihat Foto Nota</a></div>`;
                 }
                 
@@ -608,18 +635,13 @@
                         </button>
                     </div>
                     <div class="md:col-span-4 text-slate-700 uppercase leading-tight text-xs md:text-sm flex flex-col items-start justify-center md:px-4 min-w-0">
-                        <!-- Tampilan Khusus Mobile: Struktur Kotak Vertikal Rata Kiri Total Presisi -->
-                        <div class="flex flex-col items-start justify-start w-full text-left md:hidden">
-                            <div class="w-full flex items-start justify-start m-0 p-0">
-                                <span class="text-slate-400 uppercase text-[9px] block shrink-0 pt-[2px] mr-1">Keterangan:</span>
-                                <div class="flex-1 flex flex-col items-start justify-start m-0 p-0 text-left">
-                                    <span class="text-left break-all w-full block">${item.keterangan}</span>
-                                    ${notaHtml}
-                                </div>
+                        <div class="w-full flex items-start justify-start m-0 p-0 md:hidden">
+                            <span class="text-slate-400 uppercase text-[9px] block shrink-0 pt-[2px] mr-1">Keterangan:</span>
+                            <div class="flex-1 flex flex-col items-start justify-start m-0 p-0 text-left">
+                                <span class="text-left break-all w-full block">${item.keterangan}</span>
+                                ${notaHtml}
                             </div>
                         </div>
-                        
-                        <!-- Layout Bawaan Desktop Asli (Kembali 100% Sesuai Kode Utama Anda) -->
                         <div class="hidden md:flex md:items-start md:w-full md:justify-start">
                             <span class="md:hidden text-slate-400 uppercase text-[9px] mr-2 block shrink-0 pt-[1px]">Keterangan:</span>
                             <span class="flex-1 md:flex-none text-left break-all">${item.keterangan}</span>
@@ -682,6 +704,7 @@
 
         async function fetchLiveKasData() {
             const statusBadge = document.getElementById("loading-status");
+            if(!statusBadge) return;
             statusBadge.innerText = "Sinkronisasi...";
             statusBadge.className = "text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full animate-pulse border border-amber-200";
             
@@ -724,8 +747,6 @@
                 nota: document.getElementById("form-nota").value
             };
             closeModal();
-            const statusBadge = document.getElementById("loading-status");
-            statusBadge.innerText = "Menyimpan...";
             
             currentDatabase.push({
                 tanggal: payload.tanggal,
@@ -753,8 +774,6 @@
         async function executeDelete(index) {
             const targetData = currentDatabase[index];
             if (!confirm(`Hapus transaksi: "${targetData.keterangan}"?`)) return;
-            const statusBadge = document.getElementById("loading-status");
-            statusBadge.innerText = "Menghapus...";
             
             const payload = {
                 action: "DELETE",
