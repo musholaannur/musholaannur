@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta viewport dikunci agar scaling terbaca akurat oleh sistem Android/iOS -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mushola Wakaf An-Nur - Laporan Infaq Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -174,14 +173,14 @@
             max-width: 300px;
         }
         .row-4 .box-keamanan, .row-4 .box-perawatan, .row-4 .box-kegiatan {
-            flex: 1.5;
+            flex: 1;
             min-width: 280px;
             max-width: 330px;
         }
-        .row-4 .box-kebersihan {
-            flex: 1.2;
+        .row-4-b .box-kebersihan {
+            flex: 1;
             min-width: 280px;
-            max-width: 310px;
+            max-width: 330px;
         }
         .row-5 .box {
             width: 100%;
@@ -276,9 +275,7 @@
 
     <div class="w-full max-w-6xl flex flex-col gap-4 relative z-10">
         
-        <!-- Pembungkus Sakral Anti-Scrollbar Horizontal -->
         <div class="outer-overflow-hadang" id="js-outer-hadang">
-            <!-- Struktur Pengurus Utama (Master Canvas 1400px) -->
             <div class="struktur-wrapper" id="js-responsive-wrapper">
                 <div class="struktur-container">
                     <div class="struktur-inner">
@@ -305,6 +302,9 @@
                             <div class="box box-keamanan"><strong>Seksi Keamanan</strong>Bp. Heru Prasetyo<br>Bp. Puguh</div>
                             <div class="box box-perawatan"><strong>Seksi Perawatan</strong>Bp. Ipin<br>Bp. Widodo<br>Bp. Suparno<br>Bp. Doni</div>
                             <div class="box box-kegiatan"><strong>Seksi Kegiatan</strong>Bp. Yatiran<br>Bp. Kardiyo<br>Ibu Nurul<br>Ibu Sumiaton<br>Sdri. Maya</div>
+                        </div>
+                        
+                        <div class="struktur-row row-4-b">
                             <div class="box box-kebersihan"><strong>Seksi Kebersihan</strong>Bp. Dwiyani<br>Bp. Sutikno</div>
                         </div>
                         
@@ -322,7 +322,6 @@
             </div>
         </div>
 
-        <!-- Header Aplikasi -->
         <div class="bg-[#115e3b] text-center py-5 md:py-6 rounded-3xl shadow-sm px-4 flex flex-col gap-1 justify-center items-center overflow-hidden">
             <h1 class="text-white text-[4.8vw] md:text-2xl tracking-wider uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] whitespace-nowrap overflow-visible block w-full text-center">
                 MUSHOLA WAKAF AN-NUR
@@ -336,14 +335,11 @@
             </div>
         </div>
 
-        <!-- Saldo Utama -->
         <div class="bg-[#2563eb] text-white text-center py-7 md:py-10 rounded-3xl shadow-md relative overflow-hidden flex items-center justify-between px-4 md:px-10">
-            <!-- Logo Rata Kiri -->
             <div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24 flex items-center justify-center">
                 <img src="https://lh3.googleusercontent.com/d/19d7WpltUXzREJVO5AekEsqwjonJk_v1y" alt="Logo Kiri" class="w-full h-full object-contain logo-terbang" style="filter: drop-shadow(0px 12px 6px rgba(0, 0, 0, 0.45));">
             </div>
             
-            <!-- Konten Tengah -->
             <div class="flex-1 flex flex-col items-center justify-center px-2">
                 <div class="flex items-center justify-center gap-2 mb-2">
                     <div class="radar-pulse"></div>
@@ -355,13 +351,11 @@
                 <p id="total-saldo" class="text-4xl md:text-7xl tracking-tight text-white" style="text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.45);">Rp 0</p>
             </div>
             
-            <!-- Logo Rata Kanan -->
             <div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24 flex items-center justify-center">
                 <img src="https://lh3.googleusercontent.com/d/12Fq-1Non8wuie0N7Qvvi6UoToZeTgsX7" alt="Logo Kanan" class="w-full h-full object-contain logo-terbang" style="filter: drop-shadow(0px 12px 6px rgba(0, 0, 0, 0.45));">
             </div>
         </div>
 
-        <!-- Ringkasan Pemasukan & Pengeluaran -->
         <div class="grid grid-cols-2 gap-3">
             <div class="bg-white border border-slate-200/80 p-3 md:p-4 rounded-2xl shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 bottom-0 w-[4px] bg-[#10b981]"></div>
@@ -375,15 +369,13 @@
             </div>
         </div>
 
-        <!-- Tombol Input -->
         <button onclick="requestAccess('add')" class="w-full bg-[#10b981] hover:bg-[#059669] text-white py-3.5 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-sm tracking-wide text-xs md:text-sm uppercase">
-            <svg xmlns="http://www.w3.org/2000/xl" class="h-4 w-4 text-emerald-100" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2001/xl" class="h-4 w-4 text-emerald-100" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
             Input Data Baru
         </button>
 
-        <!-- Tabel Mutasi -->
         <div class="bg-white border border-slate-200 rounded-2xl p-3 md:p-6 shadow-sm overflow-hidden">
             <div class="flex justify-between items-center mb-4 w-full">
                 <h2 class="text-emerald-800 text-xs md:text-base tracking-wide uppercase border-b-2 border-[#115e3b] pb-0.5 font-black">LAPORAN MUTASI INFAQ</h2>
@@ -407,7 +399,6 @@
         </div>
     </div>
 
-    <!-- Modals Transaksi -->
     <div id="transaction-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-sm p-5 shadow-xl relative text-slate-800">
             <h3 id="modal-title" class="text-[#115e3b] text-sm uppercase mb-4">Input Data Infaq</h3>
@@ -445,7 +436,6 @@
         </div>
     </div>
 
-    <!-- Modals PIN -->
     <div id="pin-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xs p-5 shadow-2xl relative text-slate-800 text-center">
             <div class="w-12 h-12 rounded-full bg-emerald-50 text-[#115e3b] flex items-center justify-center mx-auto mb-3">
@@ -467,7 +457,6 @@
         </div>
     </div>
 
-    <!-- Script Multi-Lifecycle Auto Scaling System & Logika Keuangan -->
     <script>
         // Fungsi Auto Scaling Khusus Takmir (Mengecilkan & Membesarkan Seluruh Font Di Dalam Border Secara Otomatis)
         function samakanDesktopDanMobile() {
@@ -766,65 +755,3 @@
                 keterangan: document.getElementById("form-keterangan").value.toUpperCase(),
                 masuk: parseInt(document.getElementById("form-masuk").value) || 0,
                 keluar: parseInt(document.getElementById("form-keluar").value) || 0,
-                nota: document.getElementById("form-nota").value
-            };
-            closeModal();
-            
-            currentDatabase.push({
-                tanggal: payload.tanggal,
-                keterangan: payload.keterangan,
-                masuk: payload.masuk,
-                keluar: payload.keluar,
-                nota: payload.nota
-            });
-            saveToLocalStorage();
-            renderData(currentDatabase);
-            
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify(payload)
-                });
-                setTimeout(fetchLiveKasData, 1200);
-            } catch (error) {
-                setTimeout(fetchLiveKasData, 1500);
-            }
-        }
-
-        async function executeDelete(index) {
-            const targetData = currentDatabase[index];
-            if (!confirm(`Hapus transaksi: "${targetData.keterangan}"?`)) return;
-            
-            const payload = {
-                action: "DELETE",
-                tanggal: targetData.tanggal,
-                keterangan: targetData.keterangan,
-                masuk: targetData.masuk,
-                keluar: targetData.keluar
-            };
-            currentDatabase.splice(index, 1);
-            saveToLocalStorage();
-            renderData(currentDatabase);
-            
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify(payload)
-                });
-                setTimeout(fetchLiveKasData, 1200);
-            } catch (error) {
-                setTimeout(fetchLiveKasData, 1500);
-            }
-        }
-
-        window.addEventListener("DOMContentLoaded", () => {
-            loadFromLocalStorage();
-            fetchLiveKasData();
-        });
-    </script>
-</body>
-</html>
