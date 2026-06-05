@@ -755,3 +755,65 @@
                 keterangan: document.getElementById("form-keterangan").value.toUpperCase(),
                 masuk: parseInt(document.getElementById("form-masuk").value) || 0,
                 keluar: parseInt(document.getElementById("form-keluar").value) || 0,
+                nota: document.getElementById("form-nota").value
+            };
+            closeModal();
+            
+            currentDatabase.push({
+                tanggal: payload.tanggal,
+                keterangan: payload.keterangan,
+                masuk: payload.masuk,
+                keluar: payload.keluar,
+                nota: payload.nota
+            });
+            saveToLocalStorage();
+            renderData(currentDatabase);
+            
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+                setTimeout(fetchLiveKasData, 1200);
+            } catch (error) {
+                setTimeout(fetchLiveKasData, 1500);
+            }
+        }
+
+        async function executeDelete(index) {
+            const targetData = currentDatabase[index];
+            if (!confirm(`Hapus transaksi: "${targetData.keterangan}"?`)) return;
+            
+            const payload = {
+                action: "DELETE",
+                tanggal: targetData.tanggal,
+                keterangan: targetData.keterangan,
+                masuk: targetData.masuk,
+                keluar: targetData.keluar
+            };
+            currentDatabase.splice(index, 1);
+            saveToLocalStorage();
+            renderData(currentDatabase);
+            
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+                setTimeout(fetchLiveKasData, 1200);
+            } catch (error) {
+                setTimeout(fetchLiveKasData, 1500);
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            loadFromLocalStorage();
+            fetchLiveKasData();
+        });
+    </script>
+</body>
+</html>
