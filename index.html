@@ -209,27 +209,28 @@
         .action-popover { animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes popIn { 0% { transform: scale(0.9) translateY(5px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
-        #mutasi-list .grid, .w-full .grid {
+        /* PERBAIKAN: Selector khusus tabel mutasi agar tidak merusak grid Pemasukan & Pengeluaran */
+        #mutasi-list .grid, .tabel-mutasi-header {
             display: grid !important;
-            grid-template-cols: repeat(12, minmax(0, 1fr)) !important;
+            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
         }
 
         @media (min-width: 768px) {
             #mutasi-list .grid { font-size: 15px !important; padding-top: 14px !important; padding-bottom: 14px !important; }
             #mutasi-list .keterangan-col span { font-size: 15px !important; }
-            #mutasi-list .keterangan-col a { font-size: 12px !important; }
+            #mutasi-list .keterangan-col a, #mutasi-list .keterangan-col button { font-size: 13px !important; }
             #mutasi-list .grid > div { font-size: 15px !important; }
             #mutasi-list .bg-blue-600 { font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
             #mutasi-list .bg-blue-600 div:last-child { font-size: 18px !important; }
         }
 
-        /* STYLES KHUSUS PRINT & PDF A4 KANVAS KUSUS MARGIN AMAN */
+        /* STYLES KHUSUS PRINT & PDF A4 */
         #pdf-export-area {
             display: none;
-            width: 680px; /* Lebar presisi agar pas di tengah A4 tanpa terdorong ke margin luar */
+            width: 680px;
             background-color: #f4f7f5;
             color: #1e293b;
-            padding: 24px 20px; /* Padding kiri-kanan diperlebar sebagai zona aman */
+            padding: 24px 20px;
             box-sizing: border-box;
             margin: 0 auto;
         }
@@ -330,7 +331,8 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <!-- TOTAL PEMASUKAN & PENGELUARAN (KEMBALI NORMAL DUA KOLOM 50:50) -->
+        <div class="grid grid-cols-2 gap-3 w-full">
             <div class="bg-white border border-slate-200/80 p-3 md:p-4 rounded-2xl shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 bottom-0 w-[4px] bg-[#10b981]"></div>
                 <p class="text-[9px] md:text-xs text-slate-500 uppercase tracking-wider mb-0.5">Total Pemasukan</p>
@@ -357,7 +359,7 @@
             </div>
             
             <div class="w-full overflow-hidden">
-                <div class="grid grid-cols-12 text-[1.6vw] md:text-sm text-slate-500 uppercase border-b border-slate-200 pb-2 mb-1 tracking-wider bg-slate-50 p-1 md:p-2 text-center w-full">
+                <div class="grid grid-cols-12 tabel-mutasi-header text-[1.6vw] md:text-sm text-slate-500 uppercase border-b border-slate-200 pb-2 mb-1 tracking-wider bg-slate-50 p-1 md:p-2 text-center w-full">
                     <div class="col-span-2 text-left pl-1">Tanggal</div>
                     <div class="col-span-4 text-left px-1">Keterangan</div>
                     <div class="col-span-2 text-right pr-1">Masuk</div>
@@ -379,23 +381,56 @@
         </div>
     </div>
 
-    <!-- AREA KHUSUS CETAK PDF DENGAN KANVAS ZONA AMAN PRESISI A4 -->
+    <!-- MODAL POPUP FULL FOTO NOTA DENGAN LOADING SPINNER HALUS -->
+    <div id="photo-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2 md:p-5 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative flex flex-col max-h-[92vh]">
+            <div class="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 bg-slate-50">
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                    <h3 id="photo-modal-title" class="text-xs md:text-sm font-black text-slate-800 tracking-wide">Lihat Nota</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a id="photo-external-link" href="#" target="_blank" rel="noopener noreferrer" class="text-[11px] text-blue-600 hover:text-blue-800 font-bold px-2 py-1 rounded hover:bg-blue-50 transition underline underline-offset-2">
+                        Buka Asli ↗
+                    </a>
+                    <button type="button" onclick="closePhotoModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-200 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-2 md:p-4 flex items-center justify-center overflow-auto bg-slate-900/5 min-h-[260px] max-h-[82vh]">
+                <div id="photo-loading-spinner" class="flex flex-col items-center justify-center p-8 text-slate-500 gap-2">
+                    <svg class="animate-spin h-7 w-7 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Memuat Foto Nota...</span>
+                </div>
+                <img id="photo-img-element" src="" alt="Foto Nota" class="hidden max-h-[78vh] w-auto max-w-full object-contain mx-auto rounded-lg shadow-sm" onload="onPhotoLoaded()" onerror="onPhotoError()">
+                <div id="photo-error-message" class="hidden flex flex-col items-center justify-center p-6 text-center">
+                    <p class="text-xs text-rose-500 font-bold mb-2">Foto tidak dapat dimuat langsung.</p>
+                    <a id="photo-error-link" href="#" target="_blank" class="text-xs text-blue-600 underline font-bold">Buka Foto di Tab Baru</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AREA KHUSUS CETAK PDF -->
     <div id="pdf-export-area">
-        <!-- HEADER HIJAU MUSHOLA -->
         <div class="pdf-keep-together" style="background-color: #115e3b; color: white; text-align: center; padding: 18px 14px; border-radius: 18px; margin-bottom: 12px;">
             <h1 style="color: #ffffff; margin: 0; font-size: 18pt; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">MUSHOLA WAKAF AN-NUR</h1>
             <p style="color: #00FF66; margin: 4px 0 0 0; font-size: 9pt; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;">LAPORAN INFAQ DIGITAL SYSTEM</p>
             <div style="color: #ffffff; font-size: 8pt; font-weight: 500; margin-top: 4px; opacity: 0.9;">Untuk Transparansi Keuangan Infaq Mushola Wakaf An-Nur | musholaannur.vercel.app</div>
         </div>
 
-        <!-- BANNER BIRU SALDO SAAT INI -->
         <div class="pdf-keep-together" style="background-color: #2563eb; color: white; text-align: center; padding: 20px 14px; border-radius: 18px; margin-bottom: 12px;">
             <div style="font-size: 8pt; color: #00FF66; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; margin-bottom: 2px;">● SYSTEM ONLINE</div>
             <div style="font-size: 9pt; color: #dbeafe; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">SALDO INFAQ SAAT INI</div>
             <div id="pdf-saldo-saat-ini" style="font-size: 30pt; font-weight: 900; color: #ffffff; margin-top: 2px; letter-spacing: -1px;">Rp 0</div>
         </div>
 
-        <!-- CARD RINGKASAN PEMASUKAN & PENGELUARAN -->
         <table class="pdf-keep-together" style="width: 100%; margin-bottom: 12px; border-collapse: separate; border-spacing: 10px 0; margin-left: -10px; width: calc(100% + 20px);">
             <tr>
                 <td style="width: 50%; background: #ffffff; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; border-radius: 14px; padding: 10px 12px;">
@@ -409,7 +444,6 @@
             </tr>
         </table>
 
-        <!-- TABEL MUTASI TRANSAKSI (CONTAINER DYNAMIC MONTHLY BLOCKS) -->
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
             <div style="color: #065f46; font-size: 10pt; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #115e3b; padding-bottom: 6px; margin-bottom: 8px; letter-spacing: 1px;">LAPORAN MUTASI INFAQ</div>
             <div id="pdf-blocks-container"></div>
@@ -419,6 +453,7 @@
             POWERED BY : MBS ID
         </div>
     </div>
+
     <!-- MODAL POPUP DOWNLOAD PDF -->
     <div id="pdf-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xs p-5 shadow-2xl relative text-slate-800 text-center">
@@ -442,7 +477,7 @@
         </div>
     </div>
 
-    <!-- POPOVER MENU AKSY MELAYANG GLOBAL -->
+    <!-- POPOVER MENU AKSI MELAYANG GLOBAL -->
     <div id="mobile-action-menu" class="hidden fixed z-50 bg-slate-900 text-white rounded-xl shadow-xl border border-slate-700 px-3 py-2 flex items-center gap-4 action-popover">
         <button id="mobile-btn-edit" class="flex items-center gap-1.5 text-amber-400 text-xs uppercase font-black tracking-wider hover:opacity-80">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
@@ -481,8 +516,8 @@
                         </div>
                     </div>
                     <div>
-                        <label class="text-[9px] text-slate-500 uppercase block mb-1">Link URL Foto Nota (Opsional)</label>
-                        <input type="url" id="form-nota" placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:border-[#115e3b]">
+                        <label class="text-[9px] text-slate-500 uppercase block mb-1">Link URL Foto / Video Nota (Pisahkan spasi/koma jika lebih dari 1)</label>
+                        <input type="text" id="form-nota" placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:border-[#115e3b]">
                     </div>
                 </div>
                 <div class="flex justify-end gap-2 mt-5">
@@ -625,7 +660,87 @@
         function openPdfModal() { document.getElementById("pdf-modal").classList.remove("hidden"); }
         function closePdfModal() { document.getElementById("pdf-modal").classList.add("hidden"); }
 
-        /* FUNGSI EKSPOR PDF REVISI DENGAN MARGIN AMAN (KOLOM TANGGAL 100% UTUH) */
+        /* DETEKSI LINK DAN PENANGANAN NOTA */
+        function extractUrls(text) {
+            if (!text) return [];
+            const matches = text.match(/https?:\/\/[^\s,]+/gi);
+            if (matches && matches.length > 0) {
+                return matches.map(u => u.trim());
+            }
+            const trimmed = text.trim();
+            return trimmed.startsWith("http") ? [trimmed] : [];
+        }
+
+        function isVideoUrl(url) {
+            return /(?:youtube\.com|youtu\.be|\.mp4|\.webm|\.ogg|\.mov)/i.test(url);
+        }
+
+        function getDirectImageUrl(url) {
+            if (!url) return "";
+            // Konversi otomatis link Google Drive ke CDN berkecepatan tinggi agar foto tampil penuh seketika
+            const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            if (driveMatch && driveMatch[1]) {
+                return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+            }
+            return url;
+        }
+
+        /* POPUP PREVIEW FULL FOTO */
+        function openPhotoModal(rawUrl, title) {
+            const modal = document.getElementById("photo-modal");
+            const titleEl = document.getElementById("photo-modal-title");
+            const imgEl = document.getElementById("photo-img-element");
+            const spinner = document.getElementById("photo-loading-spinner");
+            const errorMsg = document.getElementById("photo-error-message");
+            const extLink = document.getElementById("photo-external-link");
+            const errLink = document.getElementById("photo-error-link");
+
+            titleEl.innerText = title;
+            extLink.href = rawUrl;
+            errLink.href = rawUrl;
+
+            imgEl.classList.add("hidden");
+            errorMsg.classList.add("hidden");
+            spinner.classList.remove("hidden");
+
+            const directUrl = getDirectImageUrl(rawUrl);
+            imgEl.src = directUrl;
+
+            modal.classList.remove("hidden");
+        }
+
+        function onPhotoLoaded() {
+            document.getElementById("photo-loading-spinner").classList.add("hidden");
+            document.getElementById("photo-img-element").classList.remove("hidden");
+        }
+
+        function onPhotoError() {
+            const imgEl = document.getElementById("photo-img-element");
+            const rawUrl = document.getElementById("photo-external-link").href;
+            const driveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            
+            // Cadangan jika format lh3 dibatasi akses
+            if (driveMatch && driveMatch[1] && !imgEl.src.includes("drive.google.com/thumbnail")) {
+                imgEl.src = `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w1600`;
+                return;
+            }
+            document.getElementById("photo-loading-spinner").classList.add("hidden");
+            document.getElementById("photo-img-element").classList.add("hidden");
+            document.getElementById("photo-error-message").classList.remove("hidden");
+        }
+
+        function closePhotoModal() {
+            const modal = document.getElementById("photo-modal");
+            const imgEl = document.getElementById("photo-img-element");
+            if (imgEl) imgEl.src = "";
+            if (modal) modal.classList.add("hidden");
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePhotoModal();
+        });
+
+        /* FUNGSI EKSPOR PDF */
         function exportToPDF() {
             const btn = document.getElementById("download-pdf-btn");
             const originalText = btn.innerHTML;
@@ -643,7 +758,6 @@
             let tempDb = [...currentDatabase];
             tempDb.sort((a, b) => parseDMYToDate(a.tanggal) - parseDMYToDate(b.tanggal));
 
-            // Kelompokkan Transaksi berdasarkan Bulan
             let monthlyGroups = [];
             let currentGroup = null;
 
@@ -670,7 +784,6 @@
                 });
             });
 
-            // Generate HTML Tabel Utama Dengan Lebar Kolom Tanggal 20% & Padding Kiri Khusus
             let blocksHtml = "";
 
             if (monthlyGroups.length === 0) {
@@ -715,7 +828,6 @@
                         `;
                     });
 
-                    // Baris Saldo Akumulasi Bulanan Sebagai Tumpuan Pindah Lembar
                     blocksHtml += `
                         <tr style="background-color: #2563eb; color: white; font-weight: 900;" class="pdf-keep-together">
                             <td colspan="4" style="text-align: left; padding: 7px 12px; font-size: 10px; letter-spacing: 1px; color: #ffffff;">AKUMULASI SALDO BULAN ${group.monthKey}</td>
@@ -737,7 +849,6 @@
 
             exportArea.style.display = "block";
 
-            // Konfigurasi Pindah Halaman Otomatis Presisi A4 dengan Margin Aman Kiri-Kanan 8mm
             const opt = {
                 margin:       [8, 8, 8, 8],
                 filename:     `Laporan_Infaq_An_Nur_${todayStr}.pdf`,
@@ -909,12 +1020,33 @@
                 rowContainer.className = `grid grid-cols-12 items-center py-2.5 border-b border-slate-100 text-[1.6vw] md:text-xs w-full tracking-tighter md:tracking-normal ${baseBgRow}`;
                 
                 let notaHtml = "";
-                if (item.nota && item.nota.trim() !== "") {
+                const urls = extractUrls(item.nota);
+                if (urls.length > 0) {
+                    const buttonsHtml = urls.map((url, idx) => {
+                        const labelText = idx === 0 ? "Lihat Nota" : `Lihat Nota ${idx}`;
+                        const cleanUrl = url.replace(/'/g, "\\'");
+                        const cleanLabel = labelText.replace(/'/g, "\\'");
+
+                        if (isVideoUrl(url)) {
+                            // Video: Langsung Direct ke YouTube di Tab Baru dengan Garis Bawah
+                            return `
+                                <a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" style="text-transform: none !important;" class="underline underline-offset-2 text-[1.2vw] md:text-[11px] text-blue-600 font-bold hover:text-blue-800 inline-block mr-2.5 cursor-pointer tracking-normal">
+                                    ${labelText}
+                                </a>
+                            `;
+                        } else {
+                            // Foto: Popup Full Foto Nota dengan Garis Bawah
+                            return `
+                                <button type="button" onclick="openPhotoModal('${cleanUrl}', '${cleanLabel}')" style="text-transform: none !important;" class="underline underline-offset-2 text-[1.2vw] md:text-[11px] text-blue-600 font-bold hover:text-blue-800 inline-block mr-2.5 cursor-pointer bg-transparent border-0 p-0 text-left tracking-normal">
+                                    ${labelText}
+                                </button>
+                            `;
+                        }
+                    }).join("");
+
                     notaHtml = `
-                        <div class="block text-left mt-0.5">
-                            <a href="${item.nota}" target="_blank" class="text-[1.1vw] md:text-[10px] text-blue-600 font-bold uppercase hover:underline block leading-none">
-                                Lihat Foto Nota
-                            </a>
+                        <div class="flex flex-wrap items-center mt-1">
+                            ${buttonsHtml}
                         </div>`;
                 }
                 
