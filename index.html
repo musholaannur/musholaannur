@@ -6,7 +6,9 @@
     <title>Mushola Wakaf An-Nur - Laporan Infaq Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Pustaka html2pdf.js untuk Generate PDF -->
+    <!-- FontAwesome Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Pustaka html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
@@ -209,7 +211,6 @@
         .action-popover { animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes popIn { 0% { transform: scale(0.9) translateY(5px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
-        /* PERBAIKAN: Selector khusus tabel mutasi agar tidak merusak grid Pemasukan & Pengeluaran */
         #mutasi-list .grid, .tabel-mutasi-header {
             display: grid !important;
             grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
@@ -224,10 +225,17 @@
             #mutasi-list .bg-blue-600 div:last-child { font-size: 18px !important; }
         }
 
-        /* STYLES KHUSUS PRINT & PDF A4 */
+        /* STYLES KHUSUS AREA PDF & PRESISI WARNA NATIVE */
+        #pdf-export-area, #pdf-export-area * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+        }
+
         #pdf-export-area {
             display: none;
-            width: 680px;
+            width: 100%;
+            max-width: 680px;
             background-color: #f4f7f5;
             color: #1e293b;
             padding: 24px 20px;
@@ -235,12 +243,49 @@
             margin: 0 auto;
         }
         .pdf-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 0px; }
-        .pdf-table th { background-color: #f8fafc; color: #475569; padding: 8px 6px; font-size: 10.5px; border-bottom: 2px solid #cbd5e1; text-transform: uppercase; }
-        .pdf-table td { padding: 8px 6px; font-size: 10px; border-bottom: 1px solid #e2e8f0; color: #0f172a; word-wrap: break-word; }
+        .pdf-table th { background-color: #f8fafc; color: #475569; padding: 8px 6px; font-size: 10.5px; border-bottom: 2px solid #cbd5e1; text-transform: uppercase; font-weight: 900; }
+        .pdf-table td { padding: 8px 6px; font-size: 10px; border-bottom: 1px solid #e2e8f0; color: #0f172a; word-wrap: break-word; font-weight: 900; }
         
         .pdf-keep-together {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
+        }
+
+        /* DUKUNGAN CETAK VEKTOR NATIVE (WINDOW.PRINT) DENGAN WARNA PRESISI 100% */
+        @media print {
+            html, body {
+                background-color: #f4f7f5 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            body * {
+                visibility: hidden !important;
+            }
+            #pdf-export-area, #pdf-export-area * {
+                visibility: visible !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            #pdf-export-area {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background-color: #f4f7f5 !important;
+            }
+            #pdf-modal, #photo-modal, #transaction-modal, #pin-modal, #mobile-action-menu, #snow-container {
+                display: none !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 6mm;
+            }
         }
     </style>
 </head>
@@ -331,7 +376,6 @@
             </div>
         </div>
 
-        <!-- TOTAL PEMASUKAN & PENGELUARAN (KEMBALI NORMAL DUA KOLOM 50:50) -->
         <div class="grid grid-cols-2 gap-3 w-full">
             <div class="bg-white border border-slate-200/80 p-3 md:p-4 rounded-2xl shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 bottom-0 w-[4px] bg-[#10b981]"></div>
@@ -381,7 +425,7 @@
         </div>
     </div>
 
-    <!-- MODAL POPUP FULL FOTO NOTA DENGAN LOADING SPINNER HALUS -->
+    <!-- MODAL POPUP FULL FOTO NOTA -->
     <div id="photo-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2 md:p-5 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative flex flex-col max-h-[92vh]">
             <div class="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 bg-slate-50">
@@ -417,62 +461,71 @@
         </div>
     </div>
 
-    <!-- AREA KHUSUS CETAK PDF -->
+    <!-- AREA KHUSUS CETAK PDF - WARNA PERSIS DENGAN WEBSITE UTAMA -->
     <div id="pdf-export-area">
-        <div class="pdf-keep-together" style="background-color: #115e3b; color: white; text-align: center; padding: 18px 14px; border-radius: 18px; margin-bottom: 12px;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 18pt; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">MUSHOLA WAKAF AN-NUR</h1>
-            <p style="color: #00FF66; margin: 4px 0 0 0; font-size: 9pt; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;">LAPORAN INFAQ DIGITAL SYSTEM</p>
-            <div style="color: #ffffff; font-size: 8pt; font-weight: 500; margin-top: 4px; opacity: 0.9;">Untuk Transparansi Keuangan Infaq Mushola Wakaf An-Nur | musholaannur.vercel.app</div>
+        <div class="pdf-keep-together" style="background-color: #115e3b !important; color: #ffffff !important; text-align: center; padding: 18px 14px; border-radius: 18px; margin-bottom: 12px; -webkit-print-color-adjust: exact !important;">
+            <h1 style="color: #ffffff !important; margin: 0; font-size: 18pt; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">MUSHOLA WAKAF AN-NUR</h1>
+            <p style="color: #00FF66 !important; margin: 4px 0 0 0; font-size: 9pt; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;">LAPORAN INFAQ DIGITAL SYSTEM</p>
+            <div style="color: #ffffff !important; font-size: 8pt; font-weight: 500; margin-top: 4px; opacity: 0.9;">Untuk Transparansi Keuangan Infaq Mushola Wakaf An-Nur | musholaannur.vercel.app</div>
         </div>
 
-        <div class="pdf-keep-together" style="background-color: #2563eb; color: white; text-align: center; padding: 20px 14px; border-radius: 18px; margin-bottom: 12px;">
-            <div style="font-size: 8pt; color: #00FF66; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; margin-bottom: 2px;">● SYSTEM ONLINE</div>
-            <div style="font-size: 9pt; color: #dbeafe; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">SALDO INFAQ SAAT INI</div>
-            <div id="pdf-saldo-saat-ini" style="font-size: 30pt; font-weight: 900; color: #ffffff; margin-top: 2px; letter-spacing: -1px;">Rp 0</div>
+        <div class="pdf-keep-together" style="background-color: #2563eb !important; color: #ffffff !important; text-align: center; padding: 20px 14px; border-radius: 18px; margin-bottom: 12px; -webkit-print-color-adjust: exact !important;">
+            <div style="font-size: 8pt; color: #00FF66 !important; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; margin-bottom: 2px;">● SYSTEM ONLINE</div>
+            <div style="font-size: 9pt; color: #dbeafe !important; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">SALDO INFAQ SAAT INI</div>
+            <div id="pdf-saldo-saat-ini" style="font-size: 30pt; font-weight: 900; color: #ffffff !important; margin-top: 2px; letter-spacing: -1px;">Rp 0</div>
         </div>
 
         <table class="pdf-keep-together" style="width: 100%; margin-bottom: 12px; border-collapse: separate; border-spacing: 10px 0; margin-left: -10px; width: calc(100% + 20px);">
             <tr>
-                <td style="width: 50%; background: #ffffff; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; border-radius: 14px; padding: 10px 12px;">
-                    <div style="font-size: 8pt; color: #64748b; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Total Pemasukan</div>
-                    <div id="pdf-pemasukan" style="font-size: 15pt; font-weight: 900; color: #10b981; margin-top: 2px;">Rp 0</div>
+                <td style="width: 50%; background: #ffffff !important; border: 1px solid #e2e8f0; border-left: 5px solid #10b981 !important; border-radius: 14px; padding: 10px 12px; -webkit-print-color-adjust: exact !important;">
+                    <div style="font-size: 8pt; color: #64748b !important; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Total Pemasukan</div>
+                    <div id="pdf-pemasukan" style="font-size: 15pt; font-weight: 900; color: #10b981 !important; margin-top: 2px;">Rp 0</div>
                 </td>
-                <td style="width: 50%; background: #ffffff; border: 1px solid #e2e8f0; border-left: 5px solid #ef4444; border-radius: 14px; padding: 10px 12px;">
-                    <div style="font-size: 8pt; color: #64748b; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Total Pengeluaran</div>
-                    <div id="pdf-pengeluaran" style="font-size: 15pt; font-weight: 900; color: #ef4444; margin-top: 2px;">Rp 0</div>
+                <td style="width: 50%; background: #ffffff !important; border: 1px solid #e2e8f0; border-left: 5px solid #ef4444 !important; border-radius: 14px; padding: 10px 12px; -webkit-print-color-adjust: exact !important;">
+                    <div style="font-size: 8pt; color: #64748b !important; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Total Pengeluaran</div>
+                    <div id="pdf-pengeluaran" style="font-size: 15pt; font-weight: 900; color: #ef4444 !important; margin-top: 2px;">Rp 0</div>
                 </td>
             </tr>
         </table>
 
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
-            <div style="color: #065f46; font-size: 10pt; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #115e3b; padding-bottom: 6px; margin-bottom: 8px; letter-spacing: 1px;">LAPORAN MUTASI INFAQ</div>
+        <div style="background: #ffffff !important; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; -webkit-print-color-adjust: exact !important;">
+            <div style="color: #115e3b !important; font-size: 10pt; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #115e3b !important; padding-bottom: 6px; margin-bottom: 8px; letter-spacing: 1px;">LAPORAN MUTASI INFAQ</div>
             <div id="pdf-blocks-container"></div>
         </div>
 
-        <div style="text-align: center; margin-top: 14px; font-size: 8pt; color: #94a3b8; font-weight: 900; letter-spacing: 2px;" class="pdf-keep-together">
+        <div style="text-align: center; margin-top: 14px; font-size: 8pt; color: #94a3b8 !important; font-weight: 900; letter-spacing: 2px;" class="pdf-keep-together">
             POWERED BY : MBS ID
         </div>
     </div>
 
-    <!-- MODAL POPUP DOWNLOAD PDF -->
-    <div id="pdf-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xs p-5 shadow-2xl relative text-slate-800 text-center">
-            <div class="w-12 h-12 rounded-full bg-emerald-100 text-[#115e3b] flex items-center justify-center mx-auto mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+    <!-- MODAL POPUP CETAK / DOWNLOAD PDF DUA PILIHAN -->
+    <div id="pdf-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 z-50">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden text-center border border-slate-200">
+            <div class="bg-emerald-800 text-white p-3 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-emerald-300 text-base"></i>
+                    <h3 class="font-black text-xs uppercase tracking-wider">Cetak / Export PDF Laporan</h3>
+                </div>
+                <button onclick="closePdfModal()" class="text-emerald-200 hover:text-white text-base font-bold">&times;</button>
             </div>
-            <h3 class="text-[#115e3b] text-sm uppercase mb-1 font-black break-words">Unduh Laporan PDF</h3>
-            <p class="text-[10px] text-slate-500 mb-5 uppercase tracking-wide break-words leading-relaxed font-bold">Format A4 Sempurna (Teks Tanggal Kiri Utuh 100%)</p>
-            
-            <div class="flex flex-col gap-2">
-                <button id="download-pdf-btn" onclick="exportToPDF()" class="w-full bg-gradient-to-r from-[#115e3b] to-[#106b3c] hover:from-[#0b3f27] hover:to-[#115e3b] text-white py-3 rounded-xl text-xs uppercase tracking-wider font-black shadow-md transition duration-200 flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#00FF66]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    <span>UNDUH PDF (PRESISI A4)</span>
-                </button>
-                <button type="button" onclick="closePdfModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 py-2.5 rounded-xl text-xs uppercase tracking-wider font-black transition">Batal</button>
+            <div class="p-4 space-y-3">
+                <div class="bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg text-left text-[10px] text-emerald-900">
+                    <p class="font-bold uppercase flex items-center gap-1 mb-0.5">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> OPSI HASIL TERBAIK & VEKTOR TAJAM:
+                    </p>
+                    <p class="text-slate-600 font-semibold">Gunakan **Cetak Vektor Native** untuk hasil PDF 100% tajam, tulisan bisa di-copy, dan warna sesuai website.</p>
+                </div>
+                <div class="pt-1 flex flex-col gap-2">
+                    <button onclick="printNativeVector()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-lg shadow-md transition uppercase tracking-wider flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i> CETAK / SIMPAN PDF VEKTOR NATIVE (100% TAJAM)
+                    </button>
+                    <button id="download-pdf-btn" onclick="exportToPDF()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-lg shadow-md transition uppercase tracking-wider flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download"></i> DOWNLOAD PDF UHD IMAGE (HIGH DPI)
+                    </button>
+                    <button onclick="closePdfModal()" class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[10px] rounded-lg uppercase">
+                        Batal
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -625,7 +678,7 @@
 
         function formatRupiahMutasi(angka, type) {
             if (angka === 0 || !angka) {
-                return `<span class="hidden md:inline text-rose-500 font-bold">-</span><span class="inline md:hidden"></span>`;
+                return `<span class="hidden md:inline font-bold" style="color: #ef4444 !important;">-</span><span class="inline md:hidden"></span>`;
             }
             return "Rp " + new Intl.NumberFormat('id-ID').format(angka);
         }
@@ -660,7 +713,6 @@
         function openPdfModal() { document.getElementById("pdf-modal").classList.remove("hidden"); }
         function closePdfModal() { document.getElementById("pdf-modal").classList.add("hidden"); }
 
-        /* DETEKSI LINK DAN PENANGANAN NOTA */
         function extractUrls(text) {
             if (!text) return [];
             const matches = text.match(/https?:\/\/[^\s,]+/gi);
@@ -677,7 +729,6 @@
 
         function getDirectImageUrl(url) {
             if (!url) return "";
-            // Konversi otomatis link Google Drive ke CDN berkecepatan tinggi agar foto tampil penuh seketika
             const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
             if (driveMatch && driveMatch[1]) {
                 return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
@@ -685,7 +736,6 @@
             return url;
         }
 
-        /* POPUP PREVIEW FULL FOTO */
         function openPhotoModal(rawUrl, title) {
             const modal = document.getElementById("photo-modal");
             const titleEl = document.getElementById("photo-modal-title");
@@ -719,7 +769,6 @@
             const rawUrl = document.getElementById("photo-external-link").href;
             const driveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
             
-            // Cadangan jika format lh3 dibatasi akses
             if (driveMatch && driveMatch[1] && !imgEl.src.includes("drive.google.com/thumbnail")) {
                 imgEl.src = `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w1600`;
                 return;
@@ -740,14 +789,8 @@
             if (e.key === 'Escape') closePhotoModal();
         });
 
-        /* FUNGSI EKSPOR PDF */
-        function exportToPDF() {
-            const btn = document.getElementById("download-pdf-btn");
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<span class="animate-pulse">MEMPROSES PDF PRESISI A4...</span>`;
-            btn.disabled = true;
-
-            const todayStr = new Date().toISOString().split('T')[0];
+        /* FUNGSI UNTUK MENYUSUN DATA DOKUMEN LAPORAN PDF DENGAN WARNA DETAIL TEPAT */
+        function preparePdfExportArea() {
             const exportArea = document.getElementById("pdf-export-area");
             const blocksContainer = document.getElementById("pdf-blocks-container");
 
@@ -790,7 +833,7 @@
                 blocksHtml = `
                     <table class="pdf-table">
                         <tr>
-                            <td style="text-align: center; color: #64748b; padding: 20px;">Belum ada data transaksi infaq.</td>
+                            <td style="text-align: center; color: #64748b !important; padding: 20px;">Belum ada data transaksi infaq.</td>
                         </tr>
                     </table>
                 `;
@@ -799,11 +842,11 @@
                     <table class="pdf-table">
                         <thead>
                             <tr>
-                                <th style="width: 20%; text-align: left; padding-left: 12px;">Tanggal</th>
-                                <th style="width: 35%; text-align: left;">Keterangan</th>
-                                <th style="width: 15%; text-align: right;">Masuk</th>
-                                <th style="width: 15%; text-align: right;">Keluar</th>
-                                <th style="width: 15%; text-align: right; padding-right: 10px;">Saldo</th>
+                                <th style="width: 20%; text-align: left; padding-left: 12px; color: #475569 !important;">Tanggal</th>
+                                <th style="width: 35%; text-align: left; color: #475569 !important;">Keterangan</th>
+                                <th style="width: 15%; text-align: right; color: #475569 !important;">Masuk</th>
+                                <th style="width: 15%; text-align: right; color: #475569 !important;">Keluar</th>
+                                <th style="width: 15%; text-align: right; padding-right: 10px; color: #475569 !important;">Saldo</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -815,23 +858,23 @@
                     group.items.forEach((item, idx) => {
                         const masuk = parseInt(item.masuk) || 0;
                         const keluar = parseInt(item.keluar) || 0;
-                        const bgRow = idx % 2 === 0 ? 'background-color: #ffffff;' : 'background-color: #f8fafc;';
+                        const bgRow = idx % 2 === 0 ? 'background-color: #ffffff !important;' : 'background-color: #f8fafc !important;';
 
                         blocksHtml += `
-                            <tr style="${bgRow}" class="pdf-keep-together">
-                                <td style="width: 20%; text-align: left; font-weight: 700; color: #475569; white-space: nowrap; padding-left: 12px;">${formatToDMYString(item.tanggal)}</td>
-                                <td style="width: 35%; text-align: left; font-weight: 900; color: #0f172a; text-transform: uppercase;">${item.keterangan}</td>
-                                <td style="width: 15%; text-align: right; font-weight: 900; color: #10b981;">${masuk > 0 ? formatRupiah(masuk) : "-"}</td>
-                                <td style="width: 15%; text-align: right; font-weight: 900; color: #ef4444;">${keluar > 0 ? "-" + formatRupiah(keluar) : "-"}</td>
-                                <td style="width: 15%; text-align: right; font-weight: 900; color: #2563eb; padding-right: 10px;">${formatRupiah(item.currentSaldo)}</td>
+                            <tr style="${bgRow} -webkit-print-color-adjust: exact !important;" class="pdf-keep-together">
+                                <td style="width: 20%; text-align: left; font-weight: 700; color: #475569 !important; white-space: nowrap; padding-left: 12px;">${formatToDMYString(item.tanggal)}</td>
+                                <td style="width: 35%; text-align: left; font-weight: 900; color: #0f172a !important; text-transform: uppercase;">${item.keterangan}</td>
+                                <td style="width: 15%; text-align: right; font-weight: 900; color: #10b981 !important;">${masuk > 0 ? formatRupiah(masuk) : "-"}</td>
+                                <td style="width: 15%; text-align: right; font-weight: 900; color: #ef4444 !important;">${keluar > 0 ? "-" + formatRupiah(keluar) : "-"}</td>
+                                <td style="width: 15%; text-align: right; font-weight: 900; color: #2563eb !important; padding-right: 10px;">${formatRupiah(item.currentSaldo)}</td>
                             </tr>
                         `;
                     });
 
                     blocksHtml += `
-                        <tr style="background-color: #2563eb; color: white; font-weight: 900;" class="pdf-keep-together">
-                            <td colspan="4" style="text-align: left; padding: 7px 12px; font-size: 10px; letter-spacing: 1px; color: #ffffff;">AKUMULASI SALDO BULAN ${group.monthKey}</td>
-                            <td style="text-align: right; padding: 7px 10px; font-size: 10.5px; color: #ffffff;">${formatRupiah(lastGroupSaldo)}</td>
+                        <tr style="background-color: #2563eb !important; color: #ffffff !important; font-weight: 900; -webkit-print-color-adjust: exact !important;" class="pdf-keep-together">
+                            <td colspan="4" style="text-align: left; padding: 7px 12px; font-size: 10px; letter-spacing: 1px; color: #ffffff !important;">AKUMULASI SALDO BULAN ${group.monthKey}</td>
+                            <td style="text-align: right; padding: 7px 10px; font-size: 10.5px; color: #ffffff !important;">${formatRupiah(lastGroupSaldo)}</td>
                         </tr>
                     `;
                 });
@@ -846,37 +889,69 @@
             document.getElementById("pdf-pemasukan").innerText = formatRupiah(totalMasuk);
             document.getElementById("pdf-pengeluaran").innerText = formatRupiah(totalKeluar);
             blocksContainer.innerHTML = blocksHtml;
+        }
 
+        /* 1. FUNGSI CETAK / SIMPAN PDF VEKTOR NATIVE (100% TAJAM & WARNA PERSIS WEBSITE) */
+        function printNativeVector() {
+            closePdfModal();
+            preparePdfExportArea();
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+
+        /* 2. FUNGSI DOWNLOAD PDF UHD IMAGE (HIGH DPI VIA HTML2PDF) */
+        function exportToPDF() {
+            const btn = document.getElementById("download-pdf-btn");
+            const originalText = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses PDF...`;
+                btn.disabled = true;
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const exportArea = document.getElementById("pdf-export-area");
+
+            preparePdfExportArea();
             exportArea.style.display = "block";
 
-            const opt = {
-                margin:       [8, 8, 8, 8],
-                filename:     `Laporan_Infaq_An_Nur_${todayStr}.pdf`,
-                image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { 
-                    scale: 3, 
-                    useCORS: true, 
-                    logging: false,
-                    scrollX: 0,
-                    scrollY: 0,
-                    windowWidth: 680
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['css', 'legacy'], avoid: ['.pdf-keep-together'] }
-            };
+            setTimeout(() => {
+                const opt = {
+                    margin:       [6, 6, 6, 6],
+                    filename:     `Laporan_Infaq_An_Nur_${todayStr}.pdf`,
+                    image:        { type: 'jpeg', quality: 1.0 },
+                    pagebreak:    { mode: ['css', 'legacy'], avoid: ['.pdf-keep-together'] },
+                    html2canvas:  { 
+                        scale: 3, 
+                        dpi: 300,
+                        letterRendering: true,
+                        useCORS: true, 
+                        allowTaint: true,
+                        logging: false,
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth: 680
+                    },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
+                };
 
-            html2pdf().set(opt).from(exportArea).save().then(() => {
-                exportArea.style.display = "none";
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                closePdfModal();
-            }).catch(err => {
-                console.error("Gagal export PDF:", err);
-                exportArea.style.display = "none";
-                alert("Gagal mengunduh PDF. Silakan coba lagi.");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            });
+                html2pdf().set(opt).from(exportArea).save().then(() => {
+                    exportArea.style.display = "none";
+                    if (btn) {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                    closePdfModal();
+                }).catch(err => {
+                    console.error("Gagal export PDF:", err);
+                    exportArea.style.display = "none";
+                    alert("Gagal mengunduh PDF. Silakan coba lagi.");
+                    if (btn) {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                });
+            }, 250);
         }
 
         function requestAccess(mode, dataId = null) {
@@ -1028,14 +1103,12 @@
                         const cleanLabel = labelText.replace(/'/g, "\\'");
 
                         if (isVideoUrl(url)) {
-                            // Video: Langsung Direct ke YouTube di Tab Baru dengan Garis Bawah
                             return `
                                 <a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" style="text-transform: none !important;" class="underline underline-offset-2 text-[1.2vw] md:text-[11px] text-blue-600 font-bold hover:text-blue-800 inline-block mr-2.5 cursor-pointer tracking-normal">
                                     ${labelText}
                                 </a>
                             `;
                         } else {
-                            // Foto: Popup Full Foto Nota dengan Garis Bawah
                             return `
                                 <button type="button" onclick="openPhotoModal('${cleanUrl}', '${cleanLabel}')" style="text-transform: none !important;" class="underline underline-offset-2 text-[1.2vw] md:text-[11px] text-blue-600 font-bold hover:text-blue-800 inline-block mr-2.5 cursor-pointer bg-transparent border-0 p-0 text-left tracking-normal">
                                     ${labelText}
